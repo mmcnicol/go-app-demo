@@ -1,0 +1,37 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x' # Or use 'stable' to always stay current
+          cache: true          # Enables automatic caching of your dependencies
+
+      - name: Install dependencies
+        run: go mod download
+
+      # Build both the Wasm frontend and the Go server using your Makefile
+      - name: Build
+        run: make build
+
+      # Run standard tests (Server/Logic)
+      - name: Run Native Tests
+        run: go test -v ./internal/...
+
+      # Run Wasm-specific tests for your UI components
+      - name: Run UI Tests (Wasm)
+        run: GOOS=js GOARCH=wasm go test -v ./internal/components/...
