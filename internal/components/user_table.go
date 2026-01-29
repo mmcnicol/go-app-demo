@@ -41,7 +41,7 @@ func (t *UserTable) Render() app.UI {
                 app.If(t.Loading, func() app.UI {
                     return app.Tr().Body(
                         app.Td().ColSpan(2).Text("Loading..."),
-                    ),
+                    )
                 }),
                 app.Range(t.Users).Slice(func(i int) app.UI {
                     return app.Tr().Body(
