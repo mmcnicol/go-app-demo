@@ -6,7 +6,7 @@ type Navbar struct {
     app.Compo
 }
 
-func (n *navbar) Render() app.UI {
+func (n *Navbar) Render() app.UI {
 	return app.Nav().Style("background-color", "#333").Style("color", "white").Body(
 		app.H1().Text("My App Admin"),
 	)

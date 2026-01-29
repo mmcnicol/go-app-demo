@@ -2,8 +2,8 @@ package components
 
 import (
 	"bytes"
-	"http"
-	"json"
+	"net/http"
+	"encoding/json"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
