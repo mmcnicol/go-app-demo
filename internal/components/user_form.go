@@ -35,7 +35,7 @@ func (f *UserForm) OnSubmit(ctx app.Context, e app.Event) {
 	
 	f.isSubmitting = true
 	f.message = "Sending data..."
-	f.Update()
+	ctx.Update()
 
 	// Logic runs in a background goroutine so the UI doesn't freeze
 	ctx.Async(func() {
@@ -77,8 +77,8 @@ func (f *UserForm) Render() app.UI {
 			),
 			app.Button().Type("submit").Disabled(f.isSubmitting).Text("Submit"),
 		),
-		app.If(f.message != "",
-			app.P().Text(f.message),
-		),
+		app.If(f.message != "", func() app.UI {
+    		return app.P().Text(f.message)
+		}),
 	)
 }

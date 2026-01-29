@@ -93,6 +93,19 @@ func (a *Autocomplete) Render() app.UI {
 			Placeholder("Type to search...").
 			OnInput(a.OnInput),
 
+		app.If(a.showPicker, func() app.UI {
+			return app.Ul().Class("picklist").Body(
+				app.Range(a.options).Slice(func(i int) app.UI {
+					opt := a.options[i]
+					return app.Li().OnClick(func(ctx app.Context, e app.Event) {
+						a.onSelect(ctx, opt)
+					}).Body(
+						a.renderOption(opt),
+					)
+				}),
+			)
+		})
+		/*
 		app.If(a.showPicker,
 			app.Ul().Class("picklist").Body(
 				app.Range(a.options).Slice(func(i int) app.UI {
@@ -105,6 +118,7 @@ func (a *Autocomplete) Render() app.UI {
 				}),
 			),
 		),
+		*/
 	)
 }
 

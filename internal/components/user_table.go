@@ -37,7 +37,12 @@ func (t *UserTable) Render() app.UI {
                 ),
             ),
             app.TBody().Body(
-                app.If(t.Loading, app.Tr().Body(app.Td().ColSpan(2).Text("Loading..."))),
+                //app.If(t.Loading, app.Tr().Body(app.Td().ColSpan(2).Text("Loading..."))),
+                app.If(t.Loading, func() app.UI {
+                    return app.Tr().Body(
+                        app.Td().ColSpan(2).Text("Loading..."),
+                    )
+                })
                 app.Range(t.Users).Slice(func(i int) app.UI {
                     return app.Tr().Body(
                         app.Td().Text(t.Users[i].Name),
@@ -78,7 +83,7 @@ func (t *UserTable) onPrev(ctx app.Context, e app.Event) {
 
 func (t *UserTable) fetchData(ctx app.Context) {
     t.Loading = true
-    t.Update()
+    ctx.Update()
 
     ctx.Async(func() {
         // Build URL with query params
