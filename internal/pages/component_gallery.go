@@ -1,6 +1,9 @@
 package pages
 
-import "github.com/maxence-charriere/go-app/v10/pkg/app"
+import (
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
+    "go-app-demo/internal/components"
+)
 
 type componentGallery struct {
     app.Compo
@@ -22,9 +25,9 @@ func (g *componentGallery) Render() app.UI {
         // Preview Area
         app.Main().Class("preview").Body(
             app.If(g.selectedComponent == "UserTable",
-                &userTable{users: mockData},
+                &components.userTable{users: mockData},
             ).ElseIf(g.selectedComponent == "Navbar",
-                &navbar{},
+                &components.navbar{},
             ),
         ),
     )

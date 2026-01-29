@@ -2,7 +2,8 @@ package pages
 
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"go-app-demo/internal/state"
+	"go-app-demo/internal/components"
+    "go-app-demo/internal/state"
 )
 
 type LoginPage struct {
@@ -12,12 +13,12 @@ type LoginPage struct {
 
 func (p *LoginPage) Render() app.UI {
     return app.Form().OnSubmit(p.Submit).Body(
-        &FormInput{
+        &components.FormInput{
             Label:     "Username",
             Value:     p.UserLoginForm.Username,
             OnChanged: func(v string) { p.UserLoginForm.Username = v },
         },
-        &FormInput{
+        &components.FormInput{
             Label:     "Password",
             Type:      "password",
             Value:     p.UserLoginForm.Password,
@@ -25,4 +26,14 @@ func (p *LoginPage) Render() app.UI {
         },
         app.Button().Type("submit").Text("Login"),
     )
+}
+
+func (p *LoginPage) Submit(ctx app.Context, e app.Event) {
+    e.PreventDefault() // Prevent the page from reloading
+    
+    // Log the data to the browser console for testing
+    app.Log("Form submitted:", p.UserLoginForm.Username)
+
+    // Example: Navigate to the home page after "login"
+    ctx.Navigate("/")
 }
