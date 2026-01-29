@@ -21,9 +21,12 @@ jobs:
           go-version: '1.25.x' # Or use 'stable' to always stay current
           cache: true          # Enables automatic caching of your dependencies
 
-      - name: Install dependencies
+      - name: Update dependencies file
         run: 
           go mod tidy
+
+      - name: Install dependencies
+        run: 
           go mod download
 
       # Build both the Wasm frontend and the Go server using your Makefile
