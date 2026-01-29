@@ -172,6 +172,46 @@ func (t *userTable) Render() app.UI {
 }
 ```
 
+### Using Standard Go Variables
+
+Since Render() is just a function, you can perform complex logic at the top of the function and store the result in a variable.
+
+```Go
+func (c *MyComponent) Render() app.UI {
+    var display app.UI
+
+    switch c.Status {
+    case "success":
+        display = app.Text("Operation successful!")
+    case "error":
+        display = app.Span().Style("color", "red").Text("Something went wrong.")
+    default:
+        display = app.Text("Pending...")
+    }
+
+    return app.Div().Body(
+        app.H2().Text("Status Check"),
+        display, // Render the variable
+    )
+}
+```
+
+### Short-Circuiting (The "Empty" UI)
+
+If you want to render nothing under a certain condition, you can return nil or an empty app.Div(). However, the cleanest way is often a simple app.If() without an .Else().
+
+```Go
+func (p *userPage) Render() app.UI {
+    return app.Div().Body(
+        app.H1().Text("Dashboard"),
+        // Only show the warning if there is an error
+        app.If(p.errorMessage != "",
+            app.Div().Class("alert-box").Text(p.errorMessage),
+        ),
+    )
+}
+```
+
 ## Key Tools for Background Tasks
 
 ctx.Async	Starts a goroutine. Use Case: Fetching data from an API, running a timer, or complex calculations.
@@ -230,5 +270,34 @@ func (t *userTable) OnNav(ctx app.Context) {
             time.Sleep(30 * time.Second)
         }
     })
+}
+```
+
+## Hyperlinks (app.A())
+
+When you use a link in go-app, it usually performs Client-Side Routing rather than a traditional page reload or a simple AJAX call.
+* Internal Links: If you click a link to a route defined in your app.Route, the library intercepts the click. It updates the URL in the address bar and swaps out the components on the screen without ever asking the server for a new HTML page.
+* External Links: If the link points outside your app, the browser handles it like a normal navigation.
+
+## Button Clicks (app.Button())
+
+A button click does nothing involving the server unless you explicitly tell it to.
+
+When you write an OnClick handler, you are executing a Go function inside the browser's Wasm runtime. If you need data from a database, you must manually perform an HTTP request (which is the Wasm equivalent of an AJAX/Fetch call).
+
+```Go
+func (p *userPage) OnClick(ctx app.Context, e app.Event) {
+    // This runs in the browser!
+    go func() {
+        // Standard Go HTTP call -> translated to AJAX/Fetch
+        res, err := http.Get("/api/users")
+        if err != nil {
+            return
+        }
+        
+        // Update local state and trigger UI refresh
+        // ... decode JSON ...
+        p.Update() 
+    }()
 }
 ```
