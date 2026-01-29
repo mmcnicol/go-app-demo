@@ -37,17 +37,21 @@ func (g *componentGallery) Render() app.UI {
         // Preview Area
         app.Main().Class("preview").Body(
             app.If(g.selectedComponent == "UserTable",
-                //components.NewUserTable(mockData),
-                &components.UserTable{
-                    Users:       mockData,
-                    CurrentPage: 1,
-                    PageSize:    10,
-                    TotalRows:   len(mockData),
-                    SortBy:      "name",
-                    SortOrder:   "asc",
+                func() app.UI {
+                    //return components.NewUserTable(mockData)
+                    return &components.UserTable{
+                        Users:       mockData,
+                        CurrentPage: 1,
+                        PageSize:    10,
+                        TotalRows:   len(mockData),
+                        SortBy:      "name",
+                        SortOrder:   "asc",
+                    }
                 },
             ).ElseIf(g.selectedComponent == "Navbar",
-                &components.Navbar{},
+                func() app.UI {
+                    return &components.Navbar{}
+                },
             ),
         ),
     )
