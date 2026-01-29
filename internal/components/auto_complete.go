@@ -104,7 +104,7 @@ func (a *Autocomplete) Render() app.UI {
 					)
 				}),
 			)
-		})
+		}),
 		/*
 		app.If(a.showPicker,
 			app.Ul().Class("picklist").Body(
