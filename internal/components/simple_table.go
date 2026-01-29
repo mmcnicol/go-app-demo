@@ -19,7 +19,7 @@ type userTable struct {
 func (t *userTable) Render() app.UI {
     return app.Table().Body(
         // Table Header
-        app.Thead().Body(
+        app.THead().Body(
             app.Tr().Body(
                 app.Th().Text("ID"),
                 app.Th().Text("Name"),
@@ -27,7 +27,7 @@ func (t *userTable) Render() app.UI {
             ),
         ),
         // Table Body with Rows
-        app.Tbody().Body(
+        app.TBody().Body(
             app.Range(t.users).Slice(func(i int) app.UI {
                 u := t.users[i]
                 return app.Tr().Body(

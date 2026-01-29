@@ -1,6 +1,11 @@
 package components
 
-import "github.com/maxence-charriere/go-app/v10/pkg/app"
+import (
+	"bytes"
+	"http"
+	"json"
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
+)
 
 type UserForm struct {
 	app.Compo

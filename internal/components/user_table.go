@@ -20,7 +20,7 @@ type UserTable struct {
 func (t *UserTable) Render() app.UI {
     return app.Div().Body(
         app.Table().Class("table").Body(
-            app.Thead().Body(
+            app.THead().Body(
                 app.Tr().Body(
                     // Sortable Header
                     app.Th().Text("Name").OnClick(func(ctx app.Context, e app.Event) {
@@ -31,7 +31,7 @@ func (t *UserTable) Render() app.UI {
                     }),
                 ),
             ),
-            app.Tbody().Body(
+            app.TBody().Body(
                 app.If(t.Loading, app.Tr().Body(app.Td().ColSpan(2).Text("Loading..."))),
                 app.Range(t.Users).Slice(func(i int) app.UI {
                     return app.Tr().Body(
