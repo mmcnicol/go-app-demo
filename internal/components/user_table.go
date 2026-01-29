@@ -1,6 +1,11 @@
 package components
 
-import "github.com/maxence-charriere/go-app/v10/pkg/app"
+import (
+    "encoding/json"
+    "fmt"
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
+    "net/http"
+)
 
 type UserTable struct {
     app.Compo

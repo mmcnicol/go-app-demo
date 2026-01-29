@@ -2,9 +2,9 @@ package components
 
 import (
 	"bytes"
-	"net/http"
 	"encoding/json"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"net/http"
 )
 
 type UserForm struct {
