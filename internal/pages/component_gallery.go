@@ -3,11 +3,21 @@ package pages
 import (
     "github.com/maxence-charriere/go-app/v10/pkg/app"
     "go-app-demo/internal/components"
+    "go-app-demo/internal/state"
 )
 
 type componentGallery struct {
     app.Compo
     selectedComponent string
+}
+
+// Define mock data
+var mockData = []state.User{
+    {Name: "John Doe", Email: "john@example.com"},
+    {Name: "Jane Smith", Email: "jane@example.com"},
+    {Name: "Bob Johnson", Email: "bob@example.com"},
+    {Name: "Alice Williams", Email: "alice@example.com"},
+    {Name: "Charlie Brown", Email: "charlie@example.com"},
 }
 
 func (g *componentGallery) Render() app.UI {
@@ -17,17 +27,27 @@ func (g *componentGallery) Render() app.UI {
             app.H3().Text("My Components"),
             app.Button().Text("UserTable").OnClick(func(ctx app.Context, e app.Event) {
                 g.selectedComponent = "UserTable"
+                g.Update()
             }),
             app.Button().Text("Navbar").OnClick(func(ctx app.Context, e app.Event) {
                 g.selectedComponent = "Navbar"
+                g.Update()
             }),
         ),
         // Preview Area
         app.Main().Class("preview").Body(
             app.If(g.selectedComponent == "UserTable",
-                &components.userTable{users: mockData},
+                //components.NewUserTable(mockData),
+                &components.UserTable{
+                    Users:       mockData,
+                    CurrentPage: 1,
+                    PageSize:    10,
+                    TotalRows:   len(mockData),
+                    SortBy:      "name",
+                    SortOrder:   "asc",
+                },
             ).ElseIf(g.selectedComponent == "Navbar",
-                &components.navbar{},
+                &components.Navbar{},
             ),
         ),
     )

@@ -4,6 +4,7 @@ import (
     "encoding/json"
     "fmt"
     "github.com/maxence-charriere/go-app/v10/pkg/app"
+    "go-app-demo/internal/state"
     "net/http"
 )
 
@@ -11,7 +12,7 @@ type UserTable struct {
     app.Compo
     
     // Data and Metadata
-    Users       []User
+    Users       []state.User
     TotalRows   int
     
     // Pagination/Sorting State
@@ -20,6 +21,17 @@ type UserTable struct {
     SortBy      string
     SortOrder   string // "asc" or "desc"
     Loading     bool
+}
+
+// Add this constructor function
+func NewUserTable(users []state.User) *UserTable {
+    return &UserTable{
+        Users:       users,
+        CurrentPage: 1,
+        PageSize:    10,
+        SortBy:      "name",
+        SortOrder:   "asc",
+    }
 }
 
 func (t *UserTable) Render() app.UI {
