@@ -145,6 +145,41 @@ When you build a go-app project, it automatically generates:
 
 In short: It's like React's programming model, but using Go's type safety, compiled into a high-performance binary that works offline like a native mobile app.
 
+## HTML Elements
+
+For every standard browser tag (like <div>, <h1>, <a>, or <input>), go-app provides a corresponding Go function. These functions use method chaining to set attributes, styles, and event handlers.
+
+An example:
+```Go
+app.Input().Type("text").Placeholder("Name")
+```
+
+## Go Custom Components
+
+Unlike standard Web Components (which use the Shadow DOM), go-app components are purely a Go abstraction.
+
+A "Component" in go-app is a Go struct that embeds app.Compo. This struct stores your application state (data) and implements a Render() method to describe how that state looks in HTML.
+
+```Go
+type MyCard struct {
+    app.Compo
+    Title       string
+    Description string
+}
+
+func (c *MyCard) Render() app.UI {
+    // Here we combine standard HTML "blocks" into a custom component
+    return app.Div().Class("card").Body(
+        app.H2().Text(c.Title),
+        app.P().Text(c.Description),
+    )
+}
+```
+
+### Automatic Updates
+
+If you modify the t.users slice and call t.Update(), the library will perform a "diff" and only re-render the rows that changed.
+
 ## Conditional Logic
 
 In go-app, conditional logic is handled using standard Go if-else or switch statements directly inside your Render() method.
@@ -301,3 +336,74 @@ func (p *userPage) OnClick(ctx app.Context, e app.Event) {
     }()
 }
 ```
+
+## Lifecycle Coordination
+
+When you nest components, go-app manages the lifecycle automatically:
+* OnMount: Called when the component is inserted into the browser DOM.
+* OnNav: Called when the page is navigated to.
+* Update: If you call p.Update() on the parent, it triggers a re-render check for all nested children.
+
+## Key Strategies for Complex Layouts
+
+### Component (Nesting)
+
+```Go
+type userPage struct {
+	app.Compo
+	// You can store components as fields to keep their state
+	nav     *navbar
+	sidebar *sidebar
+}
+
+// OnInit is a lifecycle method called when the component is created
+func (p *userPage) OnInit() {
+	p.nav = &navbar{}
+	p.sidebar = &sidebar{}
+}
+
+func (p *userPage) Render() app.UI {
+	return app.Div().Body(
+		p.nav, // Nesting the navbar component
+		app.Main().Body(
+			p.sidebar, // Nesting the sidebar component
+			app.Div().Style("margin-left", "210px").Body(
+				app.H2().Text("User Management"),
+				// You can also nest components inline
+				&userTable{
+					users: []User{
+						{1, "Alice", "alice@gmail.com"},
+						{2, "Bob", "bob@gmail.com"},
+					},
+				},
+			),
+		),
+	)
+}
+```
+
+### Passing Data Down (Props)
+
+In go-app, "props" are just exported fields on your struct. In the example above, the userPage passed a slice of User data to the userTable struct during initialization.
+
+### Content Injection (Slots)
+
+Sometimes you want a layout component (like a "Modal" or "Card") that can wrap any content. You do this by adding an app.UI field to your struct:
+
+```Go
+type wrapper struct {
+	app.Compo
+	Content app.UI // This acts like a "slot" or "children"
+}
+
+func (w *wrapper) Render() app.UI {
+	return app.Div().Class("fancy-border").Body(
+		app.H3().Text("Wrapper Title"),
+		w.Content, // Render whatever was passed in
+	)
+}
+
+// Usage:
+// &wrapper{ Content: app.Text("Hello World") }
+```
+
