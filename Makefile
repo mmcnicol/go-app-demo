@@ -3,24 +3,35 @@ BINARY_NAME=server
 WASM_OUT=web/app.wasm
 SERVER_DIR=./cmd/server
 WASM_DIR=./cmd/wasm
+APP_PKG=github.com/maxence-charriere/go-app/v10/pkg/app
 
-.PHONY: all build wasm server clean run
+.PHONY: all build wasm server clean deps run
 
 # Default target: build everything
 all: build
 
-build: wasm server
+# New target to install/update the go-app dependency
+deps:
+	@echo "Installing go-app v10..."
+	go get -u $(APP_PKG)
+	go mod tidy
 
-# 1. Build the Frontend (WebAssembly)
+# Cleanup unused dependencies
+tidy:
+	go mod tidy
+
+# Build the Frontend (WebAssembly)
 # Note: GOOS=js and GOARCH=wasm are required for go-app to run in the browser
 wasm:
 	@echo "Building WebAssembly..."
 	GOOS=js GOARCH=wasm go build -o $(WASM_OUT) $(WASM_DIR)
 
-# 2. Build the Backend (Server)
+# Build the Backend (Server)
 server:
 	@echo "Building Server..."
 	go build -o $(BINARY_NAME) $(SERVER_DIR)
+
+build: wasm server
 
 # Run the application
 run: build
