@@ -109,8 +109,8 @@ func (t *UserTable) fetchData(ctx app.Context) {
         defer res.Body.Close()
 
         var result struct {
-            Data  []User `json:"data"`
-            Total int    `json:"total"`
+            Data  []state.User `json:"data"`
+            Total int          `json:"total"`
         }
         json.NewDecoder(res.Body).Decode(&result)
 
