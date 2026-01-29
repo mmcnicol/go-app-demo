@@ -27,11 +27,11 @@ func (g *componentGallery) Render() app.UI {
             app.H3().Text("My Components"),
             app.Button().Text("UserTable").OnClick(func(ctx app.Context, e app.Event) {
                 g.selectedComponent = "UserTable"
-                g.Update()
+                ctx.Update()
             }),
             app.Button().Text("Navbar").OnClick(func(ctx app.Context, e app.Event) {
                 g.selectedComponent = "Navbar"
-                g.Update()
+                ctx.Update()
             }),
         ),
         // Preview Area
