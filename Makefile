@@ -21,8 +21,12 @@ deps:
 	#cp $$(go env GOROOT)/misc/wasm/wasm_exec_node.js $$(go env GOPATH)/bin/go_js_wasm_exec || \
 	#cp $$(go env GOROOT)/lib/wasm/wasm_exec_node.js $$(go env GOPATH)/bin/go_js_wasm_exec
 	#chmod +x $$(go env GOPATH)/bin/go_js_wasm_exec
-	@echo "Downloading Wasm runner..."
-	curl -L https://raw.githubusercontent.com/golang/go/master/lib/wasm/wasm_exec_node.js > $$(go env GOPATH)/bin/go_js_wasm_exec
+	#@echo "Downloading Wasm runner..."
+	#curl -L https://raw.githubusercontent.com/golang/go/master/lib/wasm/wasm_exec_node.js > $$(go env GOPATH)/bin/go_js_wasm_exec
+	@echo "Downloading and patching Wasm runner..."
+	@# Create the file with the shebang line first, then append the script content
+	echo "#!/usr/bin/env node" > $$(go env GOPATH)/bin/go_js_wasm_exec
+	curl -L https://raw.githubusercontent.com/golang/go/master/lib/wasm/wasm_exec_node.js >> $$(go env GOPATH)/bin/go_js_wasm_exec
 	chmod +x $$(go env GOPATH)/bin/go_js_wasm_exec
 
 # Cleanup unused dependencies
