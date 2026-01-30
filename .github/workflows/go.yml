@@ -21,12 +21,9 @@ jobs:
           go-version: '1.25.x' # Or use 'stable' to always stay current
           cache: true          # Enables automatic caching of your dependencies
 
-      - name: Update dependencies file
-        run: 
-          go mod tidy
-
       - name: Install dependencies
-        run: 
+        run: |
+          go mod tidy
           go mod download
 
       # Build both the Wasm frontend and the Go server using your Makefile
@@ -43,8 +40,7 @@ jobs:
       #    ln -s $(go env GOROOT)/lib/wasm/wasm_exec_js.js .
       #    export PATH=$PATH:$(go env GOROOT)/misc/wasm
 
-      # Remove or comment out the WASM-specific test line
-      #- name: Run UI Tests (Wasm)
-      #  run: |
-      #    GOOS=js GOARCH=wasm go test -v ./internal/components/...
-      #    GOOS=js GOARCH=wasm go test -v ./internal/pages/...
+      - name: Run UI Tests (Wasm)
+        run: |
+          GOOS=js GOARCH=wasm go test -v ./internal/components/...
+          GOOS=js GOARCH=wasm go test -v ./internal/pages/...
