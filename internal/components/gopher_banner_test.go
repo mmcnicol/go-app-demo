@@ -12,7 +12,7 @@ import (
 func TestGopherBannerRender(t *testing.T) {
 	
 	gopherDemographics := &models.GopherDemographics{
-		GopherId: "1"
+		GopherId: "1",
         Name: "Test",
         DateOfBirth: time.Date(1949, time.January, 2, 0, 0, 0, 0, time.UTC),
     }
