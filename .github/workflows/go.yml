@@ -42,5 +42,6 @@ jobs:
 
       - name: Run UI Tests (Wasm)
         run: |
+          export PATH=$(go env GOROOT)/misc/wasm:$PATH
           GOOS=js GOARCH=wasm go test -v ./internal/components/...
           GOOS=js GOARCH=wasm go test -v ./internal/pages/...
