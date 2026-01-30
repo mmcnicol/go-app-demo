@@ -14,6 +14,8 @@ all: build
 deps:
 	@echo "Installing go-app v10..."
 	go get -u $(APP_PKG)
+	go install github.com/agnivade/wasmbrowsertest@latest
+	mv `go env GOPATH`/bin/wasmbrowsertest `go env GOPATH`/bin/go_js_wasm_exec
 	go mod tidy
 
 # Cleanup unused dependencies
@@ -31,7 +33,7 @@ server:
 	@echo "Building Server..."
 	go build -o $(BINARY_NAME) $(SERVER_DIR)
 
-build: wasm server
+build: deps wasm server
 
 # Run the application
 run: build

@@ -39,6 +39,7 @@ jobs:
           # Link the Go Wasm runner so 'go test' can execute the binary using Node.js
           ln -s $(go env GOROOT)/lib/wasm/wasm_exec_js.js .
           export PATH=$PATH:$(go env GOROOT)/misc/wasm
+          
 
       - name: Run UI Tests (Wasm)
         run: |
