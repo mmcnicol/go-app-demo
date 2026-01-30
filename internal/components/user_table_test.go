@@ -21,10 +21,12 @@ func TestUserTableRender(t *testing.T) {
     }
     
     // Render the component
-    ui := ut.Render()
+    disp := app.Test(hp)
     
     // Get HTML representation
-    html := app.Test(ui)
+    var b strings.Builder
+	disp.Render(&b)
+	html := b.String()
     
     // Basic checks
     if html == "" {

@@ -1,29 +1,32 @@
-// internal/pages/home_test.go
 package pages
 
 import (
-    "testing"
-    "strings"
-    "github.com/maxence-charriere/go-app/v10/pkg/app"
+	"strings"
+	"testing"
+
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 func TestHomePage(t *testing.T) {
-    // Create the component
-    hp := &HomePage{}
-    
-    // Use app.Test to mount the component
-    ui := hp.Render()
-    
-    // Get the HTML string representation
-    html := app.Test(ui)
-    
-    // Check for expected content
-    if !strings.Contains(html, "Welcome to the Prototype") {
-        t.Errorf("HomePage did not render expected text. Got:\n%s", html)
-    }
-    
-    // You can also check for specific HTML tags
-    if !strings.Contains(html, "<h1>") {
-        t.Error("HomePage did not render H1 tag")
-    }
+	// 1. Create the component
+	hp := &HomePage{}
+
+	// 2. Setup the test handler
+	// In v10, app.Test returns a dispatcher that "mounts" the component
+	disp := app.Test(hp)
+
+	// 3. Get the HTML representation of the component
+	// We use strings.Builder to capture the rendered output
+	var b strings.Builder
+	disp.Render(&b)
+	html := b.String()
+
+	// 4. Assertions
+	if !strings.Contains(html, "Welcome to the Prototype") {
+		t.Errorf("HomePage did not render expected text. Got:\n%s", html)
+	}
+
+	if !strings.Contains(html, "<h1>") {
+		t.Error("HomePage did not render H1 tag")
+	}
 }
