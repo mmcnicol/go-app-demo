@@ -5,7 +5,7 @@ SERVER_DIR=./cmd/server
 WASM_DIR=./cmd/wasm
 APP_PKG=github.com/maxence-charriere/go-app/v10/pkg/app
 
-.PHONY: all build wasm server clean deps run
+.PHONY: all build wasm server clean deps run test
 
 # Default target: build everything
 all: build
@@ -37,6 +37,11 @@ build: wasm server
 run: build
 	@echo "Starting server at http://localhost:8080"
 	./$(BINARY_NAME)
+
+# Run tests
+test:
+	@echo "Running tests..."
+	go test -v ./...
 
 # Clean build artifacts
 clean:
