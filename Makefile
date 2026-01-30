@@ -16,17 +16,18 @@ deps:
 	go get -u $(APP_PKG)
 	# go install github.com/agnivade/wasmbrowsertest@latest
 	# mv `go env GOPATH`/bin/wasmbrowsertest `go env GOPATH`/bin/go_js_wasm_exec
-	go mod tidy
-	# Link the standard Go Wasm runner so 'go test' finds it
-	#cp $$(go env GOROOT)/misc/wasm/wasm_exec_node.js $$(go env GOPATH)/bin/go_js_wasm_exec || \
-	#cp $$(go env GOROOT)/lib/wasm/wasm_exec_node.js $$(go env GOPATH)/bin/go_js_wasm_exec
-	#chmod +x $$(go env GOPATH)/bin/go_js_wasm_exec
-	#@echo "Downloading Wasm runner..."
-	#curl -L https://raw.githubusercontent.com/golang/go/master/lib/wasm/wasm_exec_node.js > $$(go env GOPATH)/bin/go_js_wasm_exec
 	@echo "Downloading and patching Wasm runner..."
-	@# Create the file with the shebang line first, then append the script content
+	@# 1. Download the core glue code (wasm_exec.js)
+	curl -L https://raw.githubusercontent.com/golang/go/master/lib/wasm/wasm_exec.js > $$(go env GOPATH)/bin/wasm_exec.js
+	@# 2. Download the Node wrapper (wasm_exec_node.js)
+	curl -L https://raw.githubusercontent.com/golang/go/master/lib/wasm/wasm_exec_node.js > $$(go env GOPATH)/bin/wasm_exec_node.js
+	@# 3. Create the final runner with a shebang and the core glue bundled inside
 	echo "#!/usr/bin/env node" > $$(go env GOPATH)/bin/go_js_wasm_exec
-	curl -L https://raw.githubusercontent.com/golang/go/master/lib/wasm/wasm_exec_node.js >> $$(go env GOPATH)/bin/go_js_wasm_exec
+	@# We append wasm_exec.js first, then the node wrapper logic
+	cat $$(go env GOPATH)/bin/wasm_exec.js >> $$(go env GOPATH)/bin/go_js_wasm_exec
+	cat $$(go env GOPATH)/bin/wasm_exec_node.js >> $$(go env GOPATH)/bin/go_js_wasm_exec
+	@# 4. Remove the 'require' line from the middle so it doesn't look for a missing file
+	sed -i "s/require(\"\.\/wasm_exec\");//g" $$(go env GOPATH)/bin/go_js_wasm_exec
 	chmod +x $$(go env GOPATH)/bin/go_js_wasm_exec
 
 # Cleanup unused dependencies
