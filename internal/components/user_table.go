@@ -23,7 +23,6 @@ type UserTable struct {
     Loading     bool
 }
 
-// Add this constructor function
 func NewUserTable(users []state.User) *UserTable {
     return &UserTable{
         Users:       users,
