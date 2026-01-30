@@ -3,7 +3,7 @@ package pages
 import (
     "github.com/maxence-charriere/go-app/v10/pkg/app"
     "go-app-demo/internal/components"
-    "go-app-demo/internal/state"
+    "go-app-demo/internal/models"
 )
 
 type ComponentGallery struct {
@@ -12,7 +12,7 @@ type ComponentGallery struct {
 }
 
 // Define mock data
-var mockData = []state.User{
+var mockData = []models.User{
     {Name: "John Doe", Email: "john@example.com"},
     {Name: "Jane Smith", Email: "jane@example.com"},
     {Name: "Bob Johnson", Email: "bob@example.com"},

@@ -3,12 +3,12 @@ package pages
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"go-app-demo/internal/components"
-    "go-app-demo/internal/state"
+    "go-app-demo/internal/models"
 )
 
 type LoginPage struct {
     app.Compo
-    UserLoginForm state.UserLoginForm // Your data struct
+    UserLoginForm models.UserLoginForm // Your data struct
 }
 
 func (p *LoginPage) Render() app.UI {

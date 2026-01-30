@@ -4,7 +4,7 @@ import (
     "encoding/json"
     "fmt"
     "github.com/maxence-charriere/go-app/v10/pkg/app"
-    "go-app-demo/internal/state"
+    "go-app-demo/internal/models"
     "net/http"
 )
 
@@ -12,7 +12,7 @@ type UserTable struct {
     app.Compo
     
     // Data and Metadata
-    Users       []state.User
+    Users       []models.User
     TotalRows   int
     
     // Pagination/Sorting State
@@ -23,7 +23,7 @@ type UserTable struct {
     Loading     bool
 }
 
-func NewUserTable(users []state.User) *UserTable {
+func NewUserTable(users []models.User) *UserTable {
     return &UserTable{
         Users:       users,
         CurrentPage: 1,
@@ -108,7 +108,7 @@ func (t *UserTable) fetchData(ctx app.Context) {
         defer res.Body.Close()
 
         var result struct {
-            Data  []state.User `json:"data"`
+            Data  []models.User `json:"data"`
             Total int          `json:"total"`
         }
         json.NewDecoder(res.Body).Decode(&result)

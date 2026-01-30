@@ -2,15 +2,16 @@ package components
 
 import (
     "testing"
+	"time"
     "strings"
-    "go-app-demo/internal/state"
+    "go-app-demo/internal/models"
 
     "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 func TestGopherBannerRender(t *testing.T) {
 	
-	gopherDemographics := &state.GopherDemographics{
+	gopherDemographics := &models.GopherDemographics{
 		GopherId: "1"
         Name: "Test",
         DateOfBirth: time.Date(1949, time.January, 2, 0, 0, 0, 0, time.UTC),

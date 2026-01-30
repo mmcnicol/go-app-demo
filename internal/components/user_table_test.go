@@ -3,14 +3,14 @@ package components
 import (
     "testing"
     "strings"
-    "go-app-demo/internal/state"
+    "go-app-demo/internal/models"
 
     "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 func TestUserTableRender(t *testing.T) {
     ut := &UserTable{
-        Users: []state.User{
+        Users: []models.User{
             {Name: "Test User", Email: "test@example.com"},
         },
         CurrentPage: 1,
@@ -38,7 +38,7 @@ func TestUserTableRender(t *testing.T) {
 
 func TestUserTableSort(t *testing.T) {
     ut := &UserTable{
-        Users: []state.User{
+        Users: []models.User{
             {Name: "Alice", Email: "alice@example.com"},
             {Name: "Bob", Email: "bob@example.com"},
         },

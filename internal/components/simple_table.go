@@ -2,20 +2,17 @@ package components
 
 import "github.com/maxence-charriere/go-app/v10/pkg/app"
 
-// 1. Define your data structure
 type User struct {
     ID    int
     Name  string
     Email string
 }
 
-// 2. Define your component
 type userTable struct {
     app.Compo
     users []User
 }
 
-// 3. Implement the Render method
 func (t *userTable) Render() app.UI {
     return app.Table().Body(
         // Table Header

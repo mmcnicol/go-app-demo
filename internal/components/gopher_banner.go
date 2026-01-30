@@ -2,15 +2,15 @@ package components
 
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"go-app-demo/internal/state"
+	"go-app-demo/internal/models"
 )
 
 type GopherBanner struct {
 	app.Compo
-	GopherDemographics state.GopherDemographics
+	GopherDemographics models.GopherDemographics
 }
 
-func NewGopherBanner(gopherDemographics state.GopherDemographics) *GopherBanner {
+func NewGopherBanner(gopherDemographics models.GopherDemographics) *GopherBanner {
     return &GopherBanner{
         GopherDemographics: gopherDemographics,
     }
