@@ -14,7 +14,7 @@ func TestHomePage(t *testing.T) {
 
 	// 2. Setup the test handler
 	// In v10, app.Test returns a dispatcher that "mounts" the component
-	disp := app.Test(hp)
+	disp := apptest.Test(hp)
 
 	// 3. Get the HTML representation of the component
 	// We use strings.Builder to capture the rendered output

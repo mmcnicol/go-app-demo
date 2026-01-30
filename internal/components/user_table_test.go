@@ -20,7 +20,7 @@ func TestUserTableRender(t *testing.T) {
     }
     
     // Render the component
-    disp := app.Test(ut)
+    disp := apptest.Test(ut)
     
     // Get HTML representation
     var b strings.Builder
@@ -58,7 +58,7 @@ func TestUserTableSort(t *testing.T) {
     
     // Test initial render
     // Render the component
-    disp := app.Test(ut)
+    disp := apptest.Test(ut)
     
     // Get HTML representation
     var b strings.Builder
@@ -76,7 +76,7 @@ func TestUserTableSort(t *testing.T) {
         ut.SortOrder = "desc"
         
         // Render the component
-        disp := app.Test(ut)
+        disp := apptest.Test(ut)
         
         // Get HTML representation
         var b strings.Builder
