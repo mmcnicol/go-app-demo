@@ -6,7 +6,7 @@ import (
     "go-app-demo/internal/state"
 )
 
-type componentGallery struct {
+type ComponentGallery struct {
     app.Compo
     selectedComponent string
 }
@@ -20,7 +20,7 @@ var mockData = []state.User{
     {Name: "Charlie Brown", Email: "charlie@example.com"},
 }
 
-func (g *componentGallery) Render() app.UI {
+func (g *ComponentGallery) Render() app.UI {
     return app.Div().Class("storybook-layout").Body(
         // Sidebar
         app.Nav().Class("sidebar").Body(
