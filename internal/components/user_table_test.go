@@ -8,9 +8,6 @@ import (
     "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
-"github.com/maxence-charriere/go-app/v10/pkg/app"
-)
-
 func TestUserTableRender(t *testing.T) {
     ut := &UserTable{
         Users: []state.User{
