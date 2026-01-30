@@ -18,8 +18,11 @@ deps:
 	# mv `go env GOPATH`/bin/wasmbrowsertest `go env GOPATH`/bin/go_js_wasm_exec
 	go mod tidy
 	# Link the standard Go Wasm runner so 'go test' finds it
-	cp $$(go env GOROOT)/misc/wasm/wasm_exec_node.js $$(go env GOPATH)/bin/go_js_wasm_exec || \
-	cp $$(go env GOROOT)/lib/wasm/wasm_exec_node.js $$(go env GOPATH)/bin/go_js_wasm_exec
+	#cp $$(go env GOROOT)/misc/wasm/wasm_exec_node.js $$(go env GOPATH)/bin/go_js_wasm_exec || \
+	#cp $$(go env GOROOT)/lib/wasm/wasm_exec_node.js $$(go env GOPATH)/bin/go_js_wasm_exec
+	#chmod +x $$(go env GOPATH)/bin/go_js_wasm_exec
+	@echo "Downloading Wasm runner..."
+	curl -L https://raw.githubusercontent.com/golang/go/master/lib/wasm/wasm_exec_node.js > $$(go env GOPATH)/bin/go_js_wasm_exec
 	chmod +x $$(go env GOPATH)/bin/go_js_wasm_exec
 
 # Cleanup unused dependencies
