@@ -1,8 +1,10 @@
 package components
 
 import (
+	"fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"go-app-demo/internal/models"
+	"time"
 )
 
 type GopherBanner struct {
@@ -22,7 +24,7 @@ func (gb *GopherBanner) Render() app.UI {
 	age := int(time.Since(gb.GopherDemographics.DateOfBirth).Hours() / 24 / 365)
 
 	return app.Div().Class("gopher-banner").Body(
-		app.Span().Text(gb.Name),
+		app.Span().Text(gb.GopherDemographics.Name),
 		app.Span().Text("DOB: "),
 		app.Span().Text(dobFormatted),
 		app.Span().Text(fmt.Sprintf(" (%d years old)", age)),
