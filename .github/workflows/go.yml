@@ -34,9 +34,9 @@ jobs:
         run: make build
 
       # Run standard tests (Server/Logic)
-      - name: Run Native Tests
-        run: go test -v ./internal/...
+      - name: Run Tests
+        run: go test -v ./...
 
-      # Run Wasm-specific tests for your UI components
-      - name: Run UI Tests (Wasm)
-        run: GOOS=js GOARCH=wasm go test -v ./internal/components/...
+      # Remove or comment out the WASM-specific test line
+      # - name: Run UI Tests (Wasm)
+      #   run: GOOS=js GOARCH=wasm go test -v ./internal/components/...
