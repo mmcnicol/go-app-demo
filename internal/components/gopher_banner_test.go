@@ -17,7 +17,7 @@ func TestGopherBannerRender(t *testing.T) {
         DateOfBirth: time.Date(1949, time.January, 2, 0, 0, 0, 0, time.UTC),
     }
 
-	gopherBanner := NewGopherBanner(gopherDemographics)
+	gopherBanner := NewGopherBanner(*gopherDemographics)
     
     html := app.HTMLString(gopherBanner)
     
