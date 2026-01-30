@@ -8,9 +8,9 @@ import (
 
 func main() {
 	// Register the components that correspond to routes
-	app.Route("/", func() app.UI { &pages.LoginPage{} } )
-	app.Route("/home", func() app.UI { &pages.HomePage{} } )
-	app.Route("/dev/storybook", func() app.UI { &pages.ComponentGallery{} } )
+	app.Route("/", func() app.UI { return &pages.LoginPage{} } )
+	app.Route("/home", func() app.UI { return &pages.HomePage{} } )
+	app.Route("/dev/storybook", func() app.UI { return &pages.ComponentGallery{} } )
 
 	// This function starts the Wasm app in the browser.
 	// It stays idle when running on the server.
