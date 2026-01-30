@@ -3,8 +3,9 @@ package components
 import (
     "testing"
     "strings"
-    "github.com/maxence-charriere/go-app/v10/pkg/app"
     "go-app-demo/internal/state"
+
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 "github.com/maxence-charriere/go-app/v10/pkg/app"
@@ -12,7 +13,7 @@ import (
 
 func TestUserTableRender(t *testing.T) {
     ut := &UserTable{
-        Users: []User{
+        Users: []state.User{
             {Name: "Test User", Email: "test@example.com"},
         },
         CurrentPage: 1,
@@ -21,7 +22,7 @@ func TestUserTableRender(t *testing.T) {
     }
     
     // Render the component
-    disp := app.Test(hp)
+    disp := app.Test(ut)
     
     // Get HTML representation
     var b strings.Builder
@@ -46,7 +47,7 @@ func TestUserTableRender(t *testing.T) {
 
 func TestUserTableSort(t *testing.T) {
     ut := &UserTable{
-        Users: []User{
+        Users: []state.User{
             {Name: "Alice", Email: "alice@example.com"},
             {Name: "Bob", Email: "bob@example.com"},
         },
@@ -58,7 +59,13 @@ func TestUserTableSort(t *testing.T) {
     }
     
     // Test initial render
-    html1 := app.Test(ut.Render())
+    // Render the component
+    disp := app.Test(ut)
+    
+    // Get HTML representation
+    var b strings.Builder
+	disp.Render(&b)
+	html1 := b.String()
     
     // You can't directly test event handlers with app.Test
     // but you can test that the component renders with initial state
@@ -70,7 +77,14 @@ func TestUserTableSort(t *testing.T) {
         ut.SortBy = "email"
         ut.SortOrder = "desc"
         
-        html2 := app.Test(ut.Render())
+        // Render the component
+        disp := app.Test(ut)
+        
+        // Get HTML representation
+        var b strings.Builder
+        disp.Render(&b)
+        html2 := b.String()
+        
         // Verify something changed if possible
         if html1 == html2 {
             t.Log("Note: Sorting might not affect rendered HTML structure")
