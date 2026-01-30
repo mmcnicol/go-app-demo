@@ -6,6 +6,7 @@ import (
     "go-app-demo/internal/state"
 
     "github.com/maxence-charriere/go-app/v10/pkg/app"
+    "github.com/maxence-charriere/go-app/v10/pkg/app/testing"
 )
 
 func TestUserTableRender(t *testing.T) {

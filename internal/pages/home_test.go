@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+    "github.com/maxence-charriere/go-app/v10/pkg/app/testing"
 )
 
 func TestHomePage(t *testing.T) {
