@@ -1,10 +1,12 @@
+// login_form.go
 package components
 
 import (
-    "fmt"
+	"fmt"
+	"time"
+
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"go-app-demo/internal/models"
-    "time"
 )
 
 // LoginHandler defines the signature for login callback functions
@@ -85,31 +87,23 @@ func (l *LoginForm) onPasswordChange(ctx app.Context, e app.Event) {
 
 func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
 	e.PreventDefault()
-    
+
 	// Validate inputs
-    err := l.validate()
-    if err != nil {
-        l.Error = err.Error()
-        ctx.Update()
-		return
-    }
-    /*
-	if l.Username == "" || l.Password == "" {
-		l.Error = "Username and password are required"
-        l.IsLoading = false
+	err := l.validate()
+	if err != nil {
+		l.Error = err.Error()
 		ctx.Update()
 		return
 	}
-	*/
 
-    app.Log("Form submitted:", l.Username)
-    app.Log("Form submitted:", l.Password)
-	
-    // Show loading state
+	app.Log("Form submitted:", l.Username)
+	app.Log("Form submitted:", l.Password)
+
+	// Show loading state
 	l.IsLoading = true
 	l.Error = ""
 	ctx.Update()
-	
+
 	// If we have a login handler, use it
 	if l.OnLogin != nil {
 		go l.performLogin(ctx)
@@ -120,56 +114,35 @@ func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
 }
 
 func (l *LoginForm) performLogin(ctx app.Context) {
-	defer func() {
-		l.Defer(func(ctx app.Context) {
-			l.IsLoading = false
-			ctx.Update()
-		})
-	}()
-	
 	// Call the provided login handler
-	_, err := l.OnLogin(ctx, l.Username, l.Password)
-	if err != nil {
-		l.Defer(func(ctx app.Context) {
+	user, err := l.OnLogin(ctx, l.Username, l.Password)
+
+	// Use Async to safely update UI from goroutine
+	ctx.Async(func() {
+		l.IsLoading = false
+
+		if err != nil {
 			l.Error = err.Error()
-			ctx.Update()
-		})
-		return
-	}
-	
-	// Success - you could trigger a navigation or state update here
-	// Typically the parent component would handle what happens after successful login
-	l.Defer(func(ctx app.Context) {
-		l.Error = "Login successful! Redirecting..."
-		// Clear form
-		l.Username = ""
-		l.Password = ""
+		} else if user != nil {
+			l.Error = "Login successful! Redirecting..."
+			// Clear form
+			l.Username = ""
+			l.Password = ""
+			// Note: The parent component will handle navigation
+		}
+
 		ctx.Update()
-		
-		// In a real app, you might navigate to another page
-		// app.Window().Get("location").Set("href", "/dashboard")
-
-        /*
-        // Example: Navigate to the home page after "login"
-        ctx.Navigate("/home")
-        */
-
 	})
 }
 
 func (l *LoginForm) mockLogin(ctx app.Context) {
 	// Simulate network delay
-	l.Dispatch(func(ctx app.Context) {
-		l.IsLoading = true
-		ctx.Update()
-	})
-	
-	// Simulate API call
 	time.Sleep(1 * time.Second)
-	
-	l.Defer(func(ctx app.Context) {
+
+	// Use Async to safely update UI from goroutine
+	ctx.Async(func() {
 		l.IsLoading = false
-		
+
 		// Simple mock validation
 		if l.Username == "demo" && l.Password == "demo" {
 			l.Error = "Login successful (mock)! Username: demo, Password: demo"
@@ -183,14 +156,67 @@ func (l *LoginForm) mockLogin(ctx app.Context) {
 }
 
 func (l *LoginForm) validate() error {
-    if l.Username == "" {
-        return fmt.Errorf("username is required")
-    }
-    if l.Password == "" {
-        return fmt.Errorf("password is required")
-    }
-    if len(l.Password) < 6 {
-        return fmt.Errorf("password must be at least 6 characters")
-    }
-    return nil
+	if l.Username == "" {
+		return fmt.Errorf("username is required")
+	}
+	if l.Password == "" {
+		return fmt.Errorf("password is required")
+	}
+	if len(l.Password) < 6 {
+		return fmt.Errorf("password must be at least 6 characters")
+	}
+	return nil
+}
+
+// Alternative version using app.Handle for cleaner error handling
+func (l *LoginForm) performLoginV2(ctx app.Context) {
+	// Call the provided login handler
+	user, err := l.OnLogin(ctx, l.Username, l.Password)
+
+	// Handle the result
+	ctx.Handle(func() {
+		l.IsLoading = false
+
+		if err != nil {
+			l.Error = err.Error()
+			ctx.Update()
+			return
+		}
+
+		if user != nil {
+			l.Error = "Login successful!"
+			l.Username = ""
+			l.Password = ""
+			ctx.Update()
+
+			// Optionally navigate after a delay
+			go func() {
+				time.Sleep(1 * time.Second)
+				ctx.Navigate("/") // Navigate to home
+			}()
+		}
+	})
+}
+
+// For v10, you can also use Defer with the context directly in some cases
+func (l *LoginForm) performLoginV3(ctx app.Context) {
+	// Defer is available on context but usually for cleanup
+	defer ctx.Defer(func() {
+		app.Log("Login attempt completed")
+	})
+
+	user, err := l.OnLogin(ctx, l.Username, l.Password)
+
+	// Use Dispatch for immediate UI updates
+	ctx.Dispatch(func(ctx app.Context) {
+		l.IsLoading = false
+		
+		if err != nil {
+			l.Error = err.Error()
+		} else {
+			l.Error = "Login successful!"
+			l.Username = ""
+			l.Password = ""
+		}
+	})
 }
