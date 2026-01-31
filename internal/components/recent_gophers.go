@@ -86,7 +86,7 @@ func (r *RecentGophers) handleSort(ctx app.Context, field string) {
         r.SortBy = field
         r.SortOrder = "asc"
     }
-    t.sortData(ctx)
+    t.sortData()
     ctx.Update() // Trigger re-render
 }
 

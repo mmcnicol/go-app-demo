@@ -86,7 +86,7 @@ func (l *LabResults) handleSort(ctx app.Context, field string) {
         l.SortBy = field
         l.SortOrder = "asc"
     }
-    l.sortData(ctx)
+    l.sortData()
     ctx.Update() // Trigger re-render
 }
 
