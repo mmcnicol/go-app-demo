@@ -6,14 +6,19 @@ import "github.com/maxence-charriere/go-app/v10/pkg/app"
 // &PageFooter{}
 type PageFooter struct {
 	app.Compo
+	CopyrightText string
 }
 
-func NewPageFooter() *PageFooter {
-    return &PageFooter{}
+func NewPageFooter(copyrightText string) *PageFooter {
+    return &PageFooter{
+        CopyrightText: copyrightText,
+    }
 }
 
 func (p *PageFooter) Render() app.UI {
-	return app.Div().Class("content-footer").Body(
-		app.P().Text("Page Footer"),
-	)
+    return app.Footer().Class("page-footer").Body(
+        app.Div().Class("footer-content").Body(
+            app.Span().Text(p.CopyrightText),
+        ),
+    )
 }

@@ -17,12 +17,12 @@ func NewLoginForm() *LoginForm {
 
 func (l *LoginForm) Render() app.UI {
     return app.Form().OnSubmit(l.Submit).Body(
-        &components.FormInput{
+        &FormInput{
             Label:     "Username",
             Value:     l.UserLoginForm.Username,
             OnChanged: func(v string) { l.UserLoginForm.Username = v },
         },
-        &components.FormInput{
+        &FormInput{
             Label:     "Password",
             Type:      "password",
             Value:     l.UserLoginForm.Password,

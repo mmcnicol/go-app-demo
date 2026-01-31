@@ -48,13 +48,13 @@ func (r *RecentGophers) Render() app.UI {
                     app.Td().ColSpan(3).Text("Loading..."),
                 )
             }),
-            app.If(len(r.gopherDemographics)==0, func() app.UI {
+            app.If(len(r.recentGophers)==0, func() app.UI {
                 return app.Tr().Body(
                     app.Td().ColSpan(3).Text("No Results Found."),
                 )
             }),
-            app.Range(r.gopherDemographics).Slice(func(i int) app.UI {
-                row := r.gopherDemographics[i]
+            app.Range(r.recentGophers).Slice(func(i int) app.UI {
+                row := r.recentGophers[i]
 				dobFormatted := row.DateOfBirth.Format("02/01/2006")
                 lastAccessedFormatted := row.DateLastAccessed.Format("02/01/2006 15:04")
                 return app.Tr().Body(

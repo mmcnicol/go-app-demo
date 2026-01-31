@@ -56,11 +56,11 @@ func (b *BasePage) Render() app.UI {
 
 	if b.user == nil {
 		return &PageLayout{
-			applicationBanner: NewApplicationBanner(),
+			applicationBanner: NewApplicationBanner("Gopher Portal"),
 			leftNavigation:    nil,
 			gopherBanner:      nil,
 			Body:              NewLoginForm(),
-			pageFooter:        NewPageFooter(),
+			pageFooter:        NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 		}
 	} else {
 		if b.patient == nil {
@@ -76,11 +76,11 @@ func (b *BasePage) Render() app.UI {
 			b.activeID = "RecentGophers"
 			b.expandedSecID = "GophersLists"
 			return &PageLayout{
-				applicationBanner: NewApplicationBanner(),
+				applicationBanner: NewApplicationBanner("Gopher Portal"),
 				leftNavigation:    NewLeftNavigation(b.navItemsNonGopherContext, b.activeID, b.expandedSecID),
 				gopherBanner:      nil,
 				Body:              content,
-				pageFooter:        NewPageFooter(),
+				pageFooter:        NewPageFooter("© 2024 Clinical Portal. All rights reserved."),
 			}
 		} else {
 			// Contextual Routing Logic
@@ -99,11 +99,11 @@ func (b *BasePage) Render() app.UI {
 			b.activeID = "LabResults"
 			b.expandedSecID = "GophersRecords"
 			return &PageLayout{
-				applicationBanner: NewApplicationBanner(),
+				applicationBanner: NewApplicationBanner("Gopher Portal"),
 				leftNavigation:    NewLeftNavigation(b.navItemsPatientContext, b.activeID, b.expandedSecID),
 				gopherBanner:      NewGopherBanner(b.gopherDemographics),
 				Body:              content,
-				pageFooter:        NewPageFooter(),
+				pageFooter:        NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 			}
 		}
 	}

@@ -256,13 +256,13 @@ func (c *ClassBuilder) String() string {
 }
 
 // SetItems allows updating navigation items dynamically
-func (n *LeftNavigation) SetItems(items []models.NavItem) {
+func (n *LeftNavigation) SetItems(ctx app.Context, items []models.NavItem) {
 	n.Items = items
 	ctx.Update()
 }
 
 // SetActiveItem allows programmatically setting active item
-func (n *LeftNavigation) SetActiveItem(itemID string) {
+func (n *LeftNavigation) SetActiveItem(ctx app.Context, itemID string) {
 	n.ActiveItemID = itemID
 	ctx.Update()
 }
