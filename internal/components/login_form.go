@@ -95,7 +95,7 @@ func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
 		go l.performLogin(ctx)
 	} else {
 		// Fallback to mock login
-		go l.mockLogin()
+		go l.mockLogin(ctx)
 	}
 }
 
