@@ -13,8 +13,12 @@ func main() {
 	//app.Route("/", func() app.Composer { return &Home{} })
 	// Register the components that correspond to routes
 	app.Route("/", func() app.Composer { return &pages.LoginPage{} })
-	app.Route("/home", func() app.Composer { return &pages.HomePage{} })
 	app.Route("/dev/storybook", func() app.Composer { return &pages.ComponentGallery{} })
+	
+	app.Route("/home", func() app.Composer { return &pages.HomePage{} })
+	//app.Route("/patients", func() app.Composer { return &pages.PatientList{} })
+	//app.Route("/discharge", func() app.Composer { return &pages.DischargeForm{} })
+	//app.Route("/discharge/{id}", func() app.Composer { return &pages.DischargeForm{} })
 
 	h := &app.Handler{
 		Name:      "Clinical Portal",

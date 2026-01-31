@@ -5,6 +5,29 @@ body { font-family: sans-serif; margin: 2rem; background: #f4f7f6; }
 .btn { padding: 8px 16px; border-radius: 4px; border: none; background: #007bff; color: white; cursor: pointer; }
 .btn:disabled { background: #ccc; }
 
+
+/* Table Sorting */
+.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortable:hover {
+    background-color: #f0f0f0;
+}
+
+.sorted-asc::after {
+    content: " ↑";
+    font-weight: bold;
+}
+
+.sorted-desc::after {
+    content: " ↓";
+    font-weight: bold;
+}
+
+
+/* Autocomplete Container */
 .autocomplete-wrapper { position: relative; width: 300px; }
 .picklist { 
     position: absolute; 
@@ -18,3 +41,159 @@ body { font-family: sans-serif; margin: 2rem; background: #f4f7f6; }
 }
 .picklist li { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
 .picklist li:hover { background: #f0f0f0; }
+
+
+/* Sidebar Container */
+.nav-sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: #1e293b; /* Deep Charcoal */
+    color: #f8fafc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    overflow-y: auto;
+}
+
+/* Navigation List */
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Individual Item Row */
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+    border-left: 4px solid transparent; /* Reserved for selected state */
+    user-select: none;
+    font-size: 0.95rem;
+    color: #94a3b8; /* Muted gray by default */
+}
+
+.nav-item:hover {
+    background-color: #334155;
+    color: #ffffff;
+}
+
+/* Selected State Indicator */
+.nav-item.selected {
+    background-color: #0f172a;
+    color: #3b82f6; /* Medical Blue */
+    border-left: 4px solid #3b82f6;
+    font-weight: 600;
+}
+
+/* Icon Spacing */
+.nav-icon {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Submenu (Expandable Section) */
+.nav-submenu {
+    background-color: #0f172a;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-submenu .nav-item {
+    padding-left: 52px; /* Indent sub-items */
+    font-size: 0.85rem;
+}
+
+/* Loading Spinner Animation */
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 50%;
+    border-top-color: #3b82f6;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+
+
+
+
+/* The top-level container */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* Horizontal Banner */
+.app-banner {
+    height: 60px;
+    background-color: #0f172a;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid #334155;
+    flex-shrink: 0;
+}
+
+/* The middle section: Sidebar + Content */
+.app-body {
+    display: flex;
+    flex: 1; /* Takes up remaining height between banner and footer */
+    overflow: hidden;
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8fafc;
+    overflow-y: auto;
+}
+
+/* Patient Demographics Bar */
+.demographics-bar {
+    background-color: #ffffff;
+    padding: 15px 25px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    gap: 40px;
+}
+
+/* Content Placeholder */
+.content-area {
+    flex: 1;
+    padding: 30px;
+}
+
+/* Footer across the main content area */
+.content-footer {
+    height: 40px;
+    background-color: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    padding: 0 25px;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+
+

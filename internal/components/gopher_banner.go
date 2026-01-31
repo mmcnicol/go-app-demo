@@ -23,7 +23,7 @@ func (gb *GopherBanner) Render() app.UI {
 	dobFormatted := gb.GopherDemographics.DateOfBirth.Format("02/01/2006")
 	age := int(time.Since(gb.GopherDemographics.DateOfBirth).Hours() / 24 / 365)
 
-	return app.Div().Class("gopher-banner").Body(
+	return app.Div().Class("demographics-bar").Body(
 		app.Span().Text(gb.GopherDemographics.Name),
 		app.Span().Text("DOB: "),
 		app.Span().Text(dobFormatted),
