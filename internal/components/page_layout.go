@@ -2,6 +2,7 @@ package components
 
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+    "go-app-demo/internal/models"
 )
 
 type PageLayout struct {
@@ -17,7 +18,7 @@ func NewPageLayout(body app.UI) *PageLayout {
     return &PageLayout{
         applicationBanner: NewApplicationBanner("Application Banner"),
         leftNavigation:    NewLeftNavigation([]models.NavItem{}, "", ""),
-        gopherBanner:      NewGopherBanner(nil),
+        gopherBanner:      NewGopherBanner(models.GopherDemographics{}),
         Body:              body,
         pageFooter:        NewPageFooter("Page Footer"),
     }

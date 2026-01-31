@@ -5,6 +5,8 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"go-app-demo/internal/models"
 	"time"
+    "sort"
+    "strings"
 )
 
 type RecentGophers struct {
@@ -86,7 +88,7 @@ func (r *RecentGophers) handleSort(ctx app.Context, field string) {
         r.SortBy = field
         r.SortOrder = "asc"
     }
-    t.sortData()
+    r.sortData()
     ctx.Update() // Trigger re-render
 }
 

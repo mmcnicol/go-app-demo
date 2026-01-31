@@ -39,11 +39,14 @@ func (t *UserTable) Render() app.UI {
             app.THead().Body(
                 app.Tr().Body(
                     // Sortable Header
-                    app.Th().Text("Name").OnClick(func(ctx app.Context, e app.Event) {
-                        t.handleSort(ctx, "name")
+                    app.Th().Text("Username").OnClick(func(ctx app.Context, e app.Event) {
+                        t.handleSort(ctx, "username")
                     }),
-                    app.Th().Text("Email").OnClick(func(ctx app.Context, e app.Event) {
-                        t.handleSort(ctx, "email")
+                    app.Th().Text("Forename").OnClick(func(ctx app.Context, e app.Event) {
+                        t.handleSort(ctx, "forename")
+                    }),
+                    app.Th().Text("Surname").OnClick(func(ctx app.Context, e app.Event) {
+                        t.handleSort(ctx, "surname")
                     }),
                 ),
             ),
@@ -51,13 +54,14 @@ func (t *UserTable) Render() app.UI {
                 //app.If(t.Loading, app.Tr().Body(app.Td().ColSpan(2).Text("Loading..."))),
                 app.If(t.Loading, func() app.UI {
                     return app.Tr().Body(
-                        app.Td().ColSpan(2).Text("Loading..."),
+                        app.Td().ColSpan(3).Text("Loading..."),
                     )
                 }),
                 app.Range(t.Users).Slice(func(i int) app.UI {
                     return app.Tr().Body(
-                        app.Td().Text(t.Users[i].Name),
-                        app.Td().Text(t.Users[i].Email),
+                        app.Td().Text(t.Users[i].Username),
+                        app.Td().Text(t.Users[i].Forename),
+                        app.Td().Text(t.Users[i].Surname),
                     )
                 }),
             ),
