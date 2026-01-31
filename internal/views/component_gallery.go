@@ -56,20 +56,20 @@ func (g *ComponentGallery) Render() app.UI {
 				g.selectedComponent = "UserTable"
 				ctx.Update()
 			}),
-			app.Button().Text("Autocomplete (Mock)").OnClick(func(ctx app.Context, e app.Event) {
+			app.Button().Text("Autocomplete").OnClick(func(ctx app.Context, e app.Event) {
 				g.selectedComponent = "Autocomplete"
+				ctx.Update()
+			}),
+			app.Button().Text("Autocomplete (Mock)").OnClick(func(ctx app.Context, e app.Event) {
+				g.selectedComponent = "Autocomplete-Mock"
 				ctx.Update()
 			}),
 			app.Button().Text("Autocomplete (API)").OnClick(func(ctx app.Context, e app.Event) {
 				g.selectedComponent = "Autocomplete-API"
 				ctx.Update()
 			}),
-			app.Button().Text("Autocomplete (Custom)").OnClick(func(ctx app.Context, e app.Event) {
-				g.selectedComponent = "Autocomplete-Custom"
-				ctx.Update()
-			}),
-			app.Button().Text("Autocomplete (Empty)").OnClick(func(ctx app.Context, e app.Event) {
-				g.selectedComponent = "Autocomplete-Empty"
+			app.Button().Text("Autocomplete (Callback)").OnClick(func(ctx app.Context, e app.Event) {
+				g.selectedComponent = "Autocomplete-Callback"
 				ctx.Update()
 			}),
 		),
@@ -79,10 +79,6 @@ func (g *ComponentGallery) Render() app.UI {
 		),
 	)
 }
-
-
-
-
 
 // Then add this helper method:
 func (g *ComponentGallery) renderSelectedComponent() app.UI {
