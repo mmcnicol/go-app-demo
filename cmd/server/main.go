@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"go-app-demo/internal/pages"
+	"go-app-demo/internal/views"
 )
 
 func main() {
@@ -12,14 +12,17 @@ func main() {
 	//app.Route("/", &Home{})
 	//app.Route("/", func() app.Composer { return &Home{} })
 	// Register the components that correspond to routes
-	app.Route("/", func() app.Composer { return &pages.LoginPage{} })
-	app.Route("/dev/storybook", func() app.Composer { return &pages.ComponentGallery{} })
+	//app.Route("/", func() app.Composer { return &pages.LoginPage{} })
+	//app.Route("/dev/storybook", func() app.Composer { return &pages.ComponentGallery{} })
 	
-	app.Route("/home", func() app.Composer { return &pages.HomePage{} })
+	//app.Route("/home", func() app.Composer { return &pages.HomePage{} })
 	//app.Route("/patients", func() app.Composer { return &pages.PatientList{} })
 	//app.Route("/discharge", func() app.Composer { return &pages.DischargeForm{} })
 	//app.Route("/discharge/{id}", func() app.Composer { return &pages.DischargeForm{} })
 
+	app.Route("/", func() app.Composer { return &views.BasePage{} })
+	app.Route("/dev/components", func() app.Composer { return &view.ComponentGallery{} })
+	
 	h := &app.Handler{
 		Name:      "Clinical Portal",
 		Description: "A minimalist prototype using Go and WebAssembly",
