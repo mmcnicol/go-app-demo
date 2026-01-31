@@ -236,8 +236,8 @@ func (n *LeftNavigation) handleItemClick(ctx app.Context, item models.NavItem) {
 	app.Log("[LeftNavigation handleItemClick] END - New ExpandedSecID:", n.ExpandedSecID, "New ActiveItemID:", n.ActiveItemID)
 	
 	// IMPORTANT: Use ctx.Async to ensure proper state update
-	ctx.Async(func() {
-		app.Log("[LeftNavigation handleItemClick async] Triggering update prerequisite using async")
+	//ctx.Async(func() {
+		//app.Log("[LeftNavigation handleItemClick async] Triggering update prerequisite using async")
 
 		// Update the navigation context
 		ctx.Dispatch(func(ctx app.Context) {
@@ -245,7 +245,7 @@ func (n *LeftNavigation) handleItemClick(ctx app.Context, item models.NavItem) {
 			ctx.Update()
 		})
 		
-	})
+	//})
 }
 
 // GetFirstChildID returns the ID of the first child NavItem if it exists
