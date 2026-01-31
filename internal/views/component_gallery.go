@@ -75,7 +75,7 @@ func (g *ComponentGallery) renderSelectedComponent() app.UI {
         return components.NewApplicationBanner(
             "Component Gallery",
             nil, //g.mockQuickSearchHandler,
-            nil //g.mockLogoutHandler,
+            nil, //g.mockLogoutHandler,
         )
     
 	/*
