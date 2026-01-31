@@ -237,8 +237,14 @@ func (n *LeftNavigation) handleItemClick(ctx app.Context, item models.NavItem) {
 	
 	// IMPORTANT: Use ctx.Async to ensure proper state update
 	ctx.Async(func() {
-		app.Log("[LeftNavigation handleItemClick async] Triggering update")
-		ctx.Update()
+		app.Log("[LeftNavigation handleItemClick async] Triggering update prerequisite using async")
+
+		// Update the navigation context
+		ctx.Dispatch(func(ctx app.Context) {
+			app.Log("[LeftNavigation handleItemClick async] Triggering update using dispatch")
+			ctx.Update()
+		})
+		
 	})
 }
 
