@@ -56,6 +56,22 @@ func (g *ComponentGallery) Render() app.UI {
 				g.selectedComponent = "UserTable"
 				ctx.Update()
 			}),
+			app.Button().Text("Autocomplete (Mock)").OnClick(func(ctx app.Context, e app.Event) {
+				g.selectedComponent = "Autocomplete"
+				g.Update()
+			}),
+			app.Button().Text("Autocomplete (API)").OnClick(func(ctx app.Context, e app.Event) {
+				g.selectedComponent = "Autocomplete-API"
+				g.Update()
+			}),
+			app.Button().Text("Autocomplete (Custom)").OnClick(func(ctx app.Context, e app.Event) {
+				g.selectedComponent = "Autocomplete-Custom"
+				g.Update()
+			}),
+			app.Button().Text("Autocomplete (Empty)").OnClick(func(ctx app.Context, e app.Event) {
+				g.selectedComponent = "Autocomplete-Empty"
+				g.Update()
+			}),
 		),
 		// Preview Area
 		app.Main().Class("preview").Body(
@@ -139,18 +155,46 @@ func (g *ComponentGallery) renderSelectedComponent() app.UI {
             SortOrder:   "asc",
         }
 
+	case "Autocomplete":
+        return components.NewAutocompleteWithMock()
+        
+    case "Autocomplete-API":
+        return components.NewAutocomplete("/api/search?q=")
+
+		case "Autocomplete-Custom":
+        return &components.Autocomplete{
+            UseMockData: true,
+            MockData: []string{
+                "Patient Records",
+                "Lab Results",
+                "Medication List",
+                "Appointment Schedule",
+                "Billing Information",
+                "Insurance Details",
+                "Clinical Notes",
+                "Test Results",
+            },
+            Placeholder: "Search clinical terms...",
+            MinChars: 1,
+            Delay: 200 * time.Millisecond,
+        }
+        
+    case "Autocomplete-Empty":
+        return &components.Autocomplete{
+            Endpoint: "", // Will use mock data
+        }
+
     default:
         return app.Div().Class("component-instructions").Body(
             app.H2().Text("Component Gallery"),
             app.P().Text("Select a component from the sidebar to preview it here."),
             app.Ul().Body(
                 app.Li().Text("UserTable - Shows a table of users with pagination"),
-                app.Li().Text("Navbar - Basic navigation bar"),
                 app.Li().Text("ApplicationBanner - Header with quick search"),
-                app.Li().Text("QuickSearch - Patient ID search component"),
+                //app.Li().Text("QuickSearch - Patient ID search component"),
                 app.Li().Text("PageFooter - Footer component"),
                 app.Li().Text("LoginForm - Login form with validation"),
-                app.Li().Text("RecentGophers - Table of gopher data"),
+                app.Li().Text("RecentGophers - List of recently accessed Gophers"),
                 app.Li().Text("LabResults - Medical lab results table"),
             ),
         )
