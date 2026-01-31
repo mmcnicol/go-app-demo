@@ -17,11 +17,11 @@ import (
 
 type BasePage struct {
 	app.Compo
-	navItemsGopherContext []NavItem
-	navItemsNonGopherContext []NavItem
+	navItemsGopherContext []models.NavItem
+	navItemsNonGopherContext []models.NavItem
 	activeID string
 	expandedSecID string
-	user User
+	user models.User
 	gopherDemographics models.GopherDemographics
 	recentGophers []models.RecentGopherItem
 	labResults []models.LabResultItem
