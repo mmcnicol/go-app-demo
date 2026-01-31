@@ -39,7 +39,7 @@ func (b *BasePage) Render() app.UI {
 		// Create login form with callback to BasePage's login method
 		loginForm := components.NewLoginForm(b.handleLogin)
 		return &components.PageLayout{
-			ApplicationBanner: components.NewApplicationBanner("Gopher Portal"),
+			ApplicationBanner: components.NewSimpleApplicationBanner("Gopher Portal"),
 			LeftNavigation:    nil,
 			GopherBanner:      nil,
 			Body:              loginForm,
@@ -59,7 +59,11 @@ func (b *BasePage) Render() app.UI {
 			b.activeID = "RecentGophers"
 			b.expandedSecID = "GophersLists"
 			return &components.PageLayout{
-				ApplicationBanner: components.NewApplicationBanner("Gopher Portal"),
+				ApplicationBanner: components.NewApplicationBanner(
+					"Gopher Portal",
+					b.handleQuickSearch, // Quick search handler
+					b.handleLogout,      // Logout handler
+				),
 				LeftNavigation:    components.NewLeftNavigation(b.navItemsNonGopherContext, b.activeID, b.expandedSecID),
 				GopherBanner:      nil,
 				Body:              content,
@@ -77,12 +81,16 @@ func (b *BasePage) Render() app.UI {
 			default:
 				content = &components.NotFoundComponent{}
 			}
-			b.gopherDemographics = b.fetchGophersDemographics()
+			//b.gopherDemographics = b.fetchGophersDemographics()
 			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 			b.activeID = "LabResults"
 			b.expandedSecID = "GophersRecords"
 			return &components.PageLayout{
-				ApplicationBanner: components.NewApplicationBanner("Gopher Portal"),
+				ApplicationBanner: components.NewApplicationBanner(
+					"Gopher Portal",
+					b.handleQuickSearch, // Quick search handler
+					b.handleLogout,      // Logout handler
+				),
 				LeftNavigation:    components.NewLeftNavigation(b.navItemsGopherContext, b.activeID, b.expandedSecID),
 				GopherBanner:      components.NewGopherBanner(b.gopherDemographics),
 				Body:              content,
@@ -125,6 +133,69 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 	}
 	
 	return nil, fmt.Errorf("invalid credentials")
+}
+
+// Quick search handler in BasePage
+func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
+	if len(patientID) != 10 {
+		return fmt.Errorf("Patient ID must be exactly 10 digits")
+	}
+	
+	// Validate numeric
+	for _, char := range patientID {
+		if char < '0' || char > '9' {
+			return fmt.Errorf("Patient ID must contain only numbers")
+		}
+	}
+	
+	app.Log("Quick searching for patient:", patientID)
+	
+	// In a real app, you would:
+	// 1. Search for the patient in your database
+	// 2. Load patient data into state
+	// 3. Navigate to patient view
+	// 4. Update navigation context
+	
+	// For demo, just show a message
+	ctx.Async(func() {
+
+		time.Sleep(1 * time.Second)
+		
+		newGopherDemographics := b.fetchGophersDemographics()
+
+		// You could show a notification or update state
+		app.Log("Found patient:", patientID)
+		
+		// Example: Navigate to patient view
+		// ctx.Navigate("/patient/" + patientID)
+		
+		// Or update current view
+		// b.loadPatientData(patientID)
+		//ctx.Update()
+
+		ctx.Dispatch(func(ctx app.Context) {
+			b.gopherDemographics = newGopherDemographics
+			// The table automatically re-renders now
+		})
+	})
+	
+	return nil
+}
+
+// Logout handler in BasePage
+func (b *BasePage) handleLogout(ctx app.Context) {
+	app.Log("Logging out user")
+	
+	// Clear user session
+	b.user = nil
+	
+	// Clear other state
+	b.gopherDemographics = nil
+	b.recentGophers = nil
+	b.labResults = nil
+	
+	// Trigger re-render
+	ctx.Update()
 }
 
 // OnMount is called when the component is first loaded

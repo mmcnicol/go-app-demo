@@ -43,6 +43,124 @@ body { font-family: sans-serif; margin: 2rem; background: #f4f7f6; }
 .picklist li:hover { background: #f0f0f0; }
 
 
+
+/* Application Banner */
+
+.app-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background-color: #1e3a8a;
+    color: white;
+    height: 60px;
+}
+
+.banner-left,
+.banner-center,
+.banner-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.banner-left h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.logout-button {
+    padding: 6px 12px;
+    background-color: transparent;
+    color: white;
+    border: 1px solid white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.logout-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.logout-placeholder {
+    opacity: 0.7;
+    font-size: 14px;
+}
+
+
+
+/* Quicksearch */
+.quick-search {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.search-container {
+    display: flex;
+    gap: 8px;
+}
+
+.search-input {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 180px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.search-button {
+    padding: 6px 12px;
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.search-button:hover:not(:disabled) {
+    background-color: #059669;
+}
+
+.search-button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.search-button .spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.search-error {
+    color: #ef4444;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+
+
+
 /* Sidebar Container */
 .nav-sidebar {
     width: 250px;
