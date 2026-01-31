@@ -11,10 +11,23 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
+/*
 // Usage:
 // For API endpoint: &components.Autocomplete{Endpoint: "/api/search"}
 // For mock data: &components.Autocomplete{UseMockData: true}
 // For demo: components.NewAutocompleteWithMock()
+
+// In your main application:
+autocomplete := &components.Autocomplete{
+    Endpoint: "/api/autocomplete",
+    Placeholder: "Search patients...",
+    OnSelect: func(id, label, value string) {
+        // Handle patient selection
+        app.Logf("Patient selected: %s", label)
+        // Navigate to patient page or update state
+    },
+}
+*/
 type Autocomplete struct {
 	app.Compo
 

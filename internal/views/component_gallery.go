@@ -58,19 +58,19 @@ func (g *ComponentGallery) Render() app.UI {
 			}),
 			app.Button().Text("Autocomplete (Mock)").OnClick(func(ctx app.Context, e app.Event) {
 				g.selectedComponent = "Autocomplete"
-				g.Update()
+				ctx.Update()
 			}),
 			app.Button().Text("Autocomplete (API)").OnClick(func(ctx app.Context, e app.Event) {
 				g.selectedComponent = "Autocomplete-API"
-				g.Update()
+				ctx.Update()
 			}),
 			app.Button().Text("Autocomplete (Custom)").OnClick(func(ctx app.Context, e app.Event) {
 				g.selectedComponent = "Autocomplete-Custom"
-				g.Update()
+				ctx.Update()
 			}),
 			app.Button().Text("Autocomplete (Empty)").OnClick(func(ctx app.Context, e app.Event) {
 				g.selectedComponent = "Autocomplete-Empty"
-				g.Update()
+				ctx.Update()
 			}),
 		),
 		// Preview Area
