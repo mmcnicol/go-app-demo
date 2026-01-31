@@ -6,12 +6,16 @@ import (
     "go-app-demo/internal/models"
 )
 
-type Login struct {
+type LoginForm struct {
     app.Compo
     UserLoginForm models.UserLoginForm // Your data struct
 }
 
-func (l *Login) Render() app.UI {
+func NewLoginForm() *LoginForm {
+    return &LoginForm{}
+}
+
+func (l *LoginForm) Render() app.UI {
     return app.Form().OnSubmit(l.Submit).Body(
         &components.FormInput{
             Label:     "Username",
@@ -28,13 +32,15 @@ func (l *Login) Render() app.UI {
     )
 }
 
-func (l *Login) Submit(ctx app.Context, e app.Event) {
+func (l *LoginForm) Submit(ctx app.Context, e app.Event) {
     e.PreventDefault() // Prevent the page from reloading
     
     // Log the data to the browser console for testing
     app.Log("Form submitted:", l.UserLoginForm.Username)
     app.Log("Form submitted:", l.UserLoginForm.Password)
 
+    /*
     // Example: Navigate to the home page after "login"
     ctx.Navigate("/home")
+    */
 }

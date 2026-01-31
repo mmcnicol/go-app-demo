@@ -104,6 +104,14 @@ type LeftNavigation struct {
 	ExpandedSecID string // Tracks the currently open accordion section
 }
 
+func NewLeftNavigation(Items []NavItem, ActiveItemID string, ExpandedSecID: string) *LeftNavigation {
+    return &LeftNavigation{
+		Items: []NavItem,
+		ActiveItemID: string,
+		ExpandedSecID: string,
+	}
+}
+
 // OnMount handles the "Default Expanded" requirement
 func (n *LeftNavigation) OnMount(ctx app.Context) {
 	for _, item := range n.Items {

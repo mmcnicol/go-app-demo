@@ -17,11 +17,12 @@ import (
 
 type BasePage struct {
 	app.Compo
-	navItemsPatientContext []NavItem
-	navItemsNonPatientContext []NavItem
+	navItemsGopherContext []NavItem
+	navItemsNonGopherContext []NavItem
 	activeID string
+	expandedSecID string
 	user User
-	patient Patient
+	gopherDemographics models.GopherDemographics
 	recentGophers []models.RecentGopherItem
 	labResults []models.LabResultItem
 }
@@ -54,53 +55,55 @@ func (b *BasePage) Render() app.UI {
     var content app.UI
 
 	if b.user == nil {
-		return &MainLayout{
-			Navigation: nil,
-			Body:       &Login{},
+		return &PageLayout{
+			applicationBanner: NewApplicationBanner(),
+			leftNavigation:    nil,
+			gopherBanner:      nil,
+			Body:              NewLoginForm(),
+			pageFooter:        NewPageFooter(),
 		}
 	} else {
 		if b.patient == nil {
 			// Contextual Routing Logic
 			switch b.activeID {
 			case "RecentGophers":
-				b.recentGophers = fetchRecentGophers()
-				content = &RecentGophers{
-					recentGophers: b.recentGophers,
-					SortBy:      "DateLastAccessed",
-					SortOrder:   "desc",
-				}
+				b.recentGophers = b.fetchRecentGophers()
+				content = NewRecentGophers(b.recentGophers)
 			default:
 				content = &NotFoundComponent{}
 			}
+			b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
+			b.activeID = "RecentGophers"
+			b.expandedSecID = "GophersLists"
 			return &PageLayout{
-				applicationBanner: &ApplicationBanner{}
-				leftNavigation: &LeftNavigation{Items: b.navItemsNonPatientContext},
-				gopherBanner: nil,
-				Body:       content,
-				pageFooter: PageFooter(),
+				applicationBanner: NewApplicationBanner(),
+				leftNavigation:    NewLeftNavigation(b.navItemsNonGopherContext, b.activeID, b.expandedSecID),
+				gopherBanner:      nil,
+				Body:              content,
+				pageFooter:        NewPageFooter(),
 			}
 		} else {
 			// Contextual Routing Logic
 			switch b.activeID {
 			case "RecentGophers":
-				b.recentGophers = fetchRecentGophers()
-				content = &RecentGophers{
-					recentGophers: b.recentGophers,
-					SortBy:      "DateLastAccessed",
-					SortOrder:   "desc",
-				}
+				b.recentGophers = b.fetchRecentGophers()
+				content = NewRecentGophers(b.recentGophers)
 			case "LabResults":
-				b.labResults = fetchLabResults()
-				content = &LabResults{labResults: b.labResults}
+				b.labResults = b.fetchLabResults()
+				content = NewLabResults(b.labResults)
 			default:
 				content = &NotFoundComponent{}
 			}
+			b.gopherDemographics = b.fetchGophersDemographics()
+			b.navItemsNonGopherContext = b.fetchNavItemsGopherContext()
+			b.activeID = "LabResults"
+			b.expandedSecID = "GophersRecords"
 			return &PageLayout{
-				applicationBanner: &ApplicationBanner{}
-				leftNavigation: &LeftNavigation{Items: b.navItemsPatientContext, ActiveItemID: b.activeID},
-				gopherBanner: GopherBanner{},
-				Body:       content,
-				pageFooter: PageFooter(),
+				applicationBanner: NewApplicationBanner(),
+				leftNavigation:    NewLeftNavigation(b.navItemsPatientContext, b.activeID, b.expandedSecID),
+				gopherBanner:      NewGopherBanner(b.gopherDemographics),
+				Body:              content,
+				pageFooter:        NewPageFooter(),
 			}
 		}
 	}
@@ -108,8 +111,10 @@ func (b *BasePage) Render() app.UI {
 
 // OnMount is called when the component is first loaded
 func (b *BasePage) OnMount(ctx app.Context) {
+	/*
     // Optional: Initialize with an empty patient or fetch from session
     ctx.SetState("current-patient", Patient{})
+	*/
 
 	/*
 	d.dischargeForm = models.DischargeForm{
@@ -121,9 +126,11 @@ func (b *BasePage) OnMount(ctx app.Context) {
 
 // OnNav is called on Browser Refresh button click or Back button click
 func (b *BasePage) OnNav(ctx app.Context) {
-    // Retrieve the object from state
+    /*
+	// Retrieve the object from state
     ctx.GetState("current-patient", &d.patient)
     d.Update()
+	*/
 }
 
 func (b *BasePage) loadPatientData(id string) {
@@ -135,6 +142,15 @@ func (b *BasePage) loadPatientData(id string) {
 		}
     }
     d.Update()
+}
+
+func (b *BasePage) fetchGophersDemographics() []models.GopherDemographics {
+	// mock
+	return models.GopherDemographics{
+		GopherId:         "gopher-001",
+		Name:             "Alice",
+		DateOfBirth:      time.Date(1990, 1, 15, 0, 0, 0, 0, time.UTC),
+	}
 }
 
 func (b *BasePage) fetchRecentGophers() []models.RecentGopherItem {
@@ -181,6 +197,67 @@ func (b *BasePage) fetchLabResults() []models.LabResultItem {
 			Subject:             "Liver",
 			//ReportDate:      time.Date(2023, 10, 5, 0, 0, 0, 0, time.UTC),
 			ReportDate: time.Now().Add(-5 * time.Hour),
+		},
+	}
+}
+
+func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
+	return []NavItem{
+		{
+			ID:    "MySettings",
+			Label: "My Settings",
+			Icon:  "fas fa-cog",
+			IsLoading: false, // Example of eager loading state
+		},
+		{
+			ID:    "GopherLists",
+			Label: "Gopher Lists",
+			Icon:  "fas fa-user-injured",
+			IsDefaultExpanded: true, // This section starts open
+			Children: []NavItem{
+				{ID: "RecentGophers", Label: "Recent Gophers", Icon: "fas fa-list", IsLoading: true },
+				{ID: "PharmacyDischargeList", Label: "Pharmacy Discharge List", Icon: "fas fa-plus-circle", IsLoading: true },
+			},
+		},
+		{
+			ID:    "GopherSearch",
+			Label: "Gopher Search",
+			Icon:  "fas fa-chart-line",
+		},
+	}
+}
+
+func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
+	return []NavItem{
+		{
+			ID:    "MySettings",
+			Label: "My Settings",
+			Icon:  "fas fa-cog",
+			IsLoading: false, // Example of eager loading state
+		},
+		{
+			ID:    "GopherLists",
+			Label: "Gopher Lists",
+			Icon:  "fas fa-user-injured",
+			IsDefaultExpanded: false,
+			Children: []NavItem{
+				{ID: "RecentGophers", Label: "Recent Gophers", Icon: "fas fa-list", IsLoading: true },
+				{ID: "PharmacyDischargeList", Label: "Pharmacy Discharge List", Icon: "fas fa-plus-circle", IsLoading: true },
+			},
+		},
+		{
+			ID:    "GopherSearch",
+			Label: "Gopher Search",
+			Icon:  "fas fa-chart-line",
+		},
+		{
+			ID:    "GopherRecords",
+			Label: "Gopher Records",
+			Icon:  "fas fa-user-injured",
+			IsDefaultExpanded: true,
+			Children: []NavItem{
+				{ID: "LabResults", Label: "Lab Results", Icon: "fas fa-list", IsLoading: true },
+			},
 		},
 	}
 }

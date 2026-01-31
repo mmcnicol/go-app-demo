@@ -6,10 +6,16 @@ import "github.com/maxence-charriere/go-app/v10/pkg/app"
 // &LabResults{ labResults: data }
 type LabResults struct {
 	app.Compo
-	labResults []LabResultItem
+	labResults  []LabResultItem
 	SortBy      string
     SortOrder   string // "asc" or "desc"
     Loading     bool
+}
+
+func NewLabResults(labResults []LabResultItem) *LabResults {
+    return &LabResults{
+        labResults: labResults,
+    }
 }
 
 func (l *LabResults) Render() app.UI {

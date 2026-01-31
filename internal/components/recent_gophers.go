@@ -15,6 +15,12 @@ type RecentGophers struct {
     Loading     bool
 }
 
+func NewRecentGophers(recentGophers []models.RecentGopherItem) *RecentGophers {
+    return &RecentGophers{
+        recentGophers: recentGophers,
+    }
+}
+
 func (r *RecentGophers) Render() app.UI {
     return app.Table().Body(
         // Table Header
@@ -132,8 +138,10 @@ func (r *RecentGophers) onPatientClick(ctx app.Context, patientID string) {
 
 // In the Patient List component
 func (r *RecentGophers) onSelect(ctx app.Context, selected Patient) {
+    /*
     // Save the object to the browser's persistent state
     // Persistent State acts like a global "Store" within the browser session.
     ctx.SetState("current-patient", selected)
     ctx.Navigate("/discharge")
+    */
 }
