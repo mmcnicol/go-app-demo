@@ -96,8 +96,8 @@ func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
 		return
 	}
 
-	app.Log("Form submitted:", l.Username)
-	app.Log("Form submitted:", l.Password)
+	//app.Log("Form submitted:", l.Username)
+	//app.Log("Form submitted:", l.Password)
 
 	// Show loading state
 	l.IsLoading = true
