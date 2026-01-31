@@ -72,6 +72,18 @@ func (b *BasePage) Render() app.UI {
 				// Update items if needed
 				b.leftNavigation.SetItems(b.navItemsNonGopherContext)
 			}
+
+			return &components.PageLayout{
+				ApplicationBanner: components.NewApplicationBanner(
+					"Gopher Portal",
+					b.handleQuickSearch, // Quick search handler
+					b.handleLogout,      // Logout handler
+				),
+				LeftNavigation:    b.leftNavigation,
+				GopherBanner:      nil,
+				Body:              content,
+				PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
+			}
 			
 		} else {
 			// Contextual Routing Logic
@@ -101,28 +113,20 @@ func (b *BasePage) Render() app.UI {
 				// Update items if needed
 				b.leftNavigation.SetItems(b.navItemsGopherContext)
 			}
-		}
-		
-		return &components.PageLayout{
-			ApplicationBanner: components.NewApplicationBanner(
-				"Gopher Portal",
-				b.handleQuickSearch, // Quick search handler
-				b.handleLogout,      // Logout handler
-			),
-			LeftNavigation:    b.leftNavigation,
-			GopherBanner:      b.getGopherBanner(),
-			Body:              content,
-			PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
-		}
-	}
-}
 
-// Helper method to get appropriate gopher banner
-func (b *BasePage) getGopherBanner() app.UI {
-	if b.gopherDemographics != nil {
-		return components.NewGopherBanner(b.gopherDemographics)
+			return &components.PageLayout{
+				ApplicationBanner: components.NewApplicationBanner(
+					"Gopher Portal",
+					b.handleQuickSearch, // Quick search handler
+					b.handleLogout,      // Logout handler
+				),
+				LeftNavigation:    b.leftNavigation,
+				GopherBanner:      components.NewGopherBanner(b.gopherDemographics),
+				Body:              content,
+				PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
+			}
+		}
 	}
-	return nil
 }
 
 // handleLogin is the callback function passed to LoginForm
@@ -239,9 +243,9 @@ func (b *BasePage) OnMount(ctx app.Context) {
 	b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 	b.activeID = "RecentGophers"
 	// Create gopher navigation instance
-	if b.leftNavigationGopher == nil {
+	if b.leftNavigation == nil {
 		app.Log("[BasePage Render] Creating new gopher navigation")
-		b.leftNavigationGopher = components.NewLeftNavigation(b.navItemsNonGopherContext)
+		b.leftNavigation = components.NewLeftNavigation(b.navItemsNonGopherContext)
 	}
 	app.Log("[BasePage OnMount] leftNavigation initialized")
 	app.Log("[BasePage OnMount] User set:", b.user)
