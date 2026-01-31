@@ -144,6 +144,8 @@ func (n *LeftNavigation) renderItem(item models.NavItem, isChild bool) app.UI {
 			Class(itemClass).
 			OnClick(func(ctx app.Context, e app.Event) {
 				app.Log("[LeftNavigation handleItemClick] Clicked on item:", item.ID, "Label:", item.Label)
+				e.PreventDefault() // Prevent default behavior
+				e.StopPropagation() // Stop event bubbling
 				n.handleItemClick(ctx, item)
 			}).
 			Body(
@@ -224,7 +226,12 @@ func (n *LeftNavigation) handleItemClick(ctx app.Context, item models.NavItem) {
 	}
 	
 	app.Log("[LeftNavigation handleItemClick] END - New ExpandedSecID:", n.ExpandedSecID, "New ActiveItemID:", n.ActiveItemID)
-	ctx.Update() // Trigger re-render
+	
+	// IMPORTANT: Use ctx.Async to ensure proper state update
+	ctx.Async(func() {
+		app.Log("[LeftNavigation handleItemClick async] Triggering update")
+		ctx.Update()
+	})
 }
 
 // Helper method to recursively find and set active item
@@ -254,12 +261,27 @@ func (n *LeftNavigation) SetItems(ctx app.Context, items []models.NavItem) {
 	// Re-initialize state based on new items
 	n.initializeState()
 	
-	ctx.Update()
+	ctx.Async(func() {
+		ctx.Update()
+	})
 }
 
 // SetActiveItem allows programmatically setting active item
 func (n *LeftNavigation) SetActiveItem(ctx app.Context, itemID string) {
 	app.Log("[LeftNavigation SetActiveItem] Setting ActiveItemID to:", itemID)
 	n.ActiveItemID = itemID
-	ctx.Update()
+	
+	ctx.Async(func() {
+		ctx.Update()
+	})
+}
+
+// SetExpandedSection allows programmatically setting expanded section
+func (n *LeftNavigation) SetExpandedSection(ctx app.Context, sectionID string) {
+	app.Log("[LeftNavigation SetExpandedSection] Setting ExpandedSecID to:", sectionID)
+	n.ExpandedSecID = sectionID
+	
+	ctx.Async(func() {
+		ctx.Update()
+	})
 }
