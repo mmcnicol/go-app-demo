@@ -7,7 +7,7 @@ import (
 )
 
 // LoginHandler defines the signature for login callback functions
-type LoginHandler func(ctx app.Context, username, password string) (*models.User, error)
+type LoginHandler func(ctx app.Context, username string, password string) (*models.User, error)
 
 type LoginForm struct {
 	app.Compo
@@ -56,7 +56,17 @@ func (l *LoginForm) Render() app.UI {
 			),
 			app.Button().
 				Type("submit").
-				Text(app.If(l.IsLoading, "Logging in...").Else("Login")).
+				Body(
+					app.If(l.IsLoading,
+						func() app.UI {
+							return app.Text("Logging in...")
+						},
+					).Else(
+						func() app.UI {
+							return app.Text("Login")
+						},
+					),
+				).
 				Disabled(l.IsLoading),
 		),
 	)
@@ -76,13 +86,21 @@ func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
 	e.PreventDefault()
     
 	// Validate inputs
+    err := validate(ctx)
+    if err != nil {
+        l.Error = err.Error()
+        ctx.Update()
+		return
+    }
+    /*
 	if l.Username == "" || l.Password == "" {
 		l.Error = "Username and password are required"
         l.IsLoading = false
 		ctx.Update()
 		return
 	}
-	
+	*/
+
     app.Log("Form submitted:", l.Username)
     app.Log("Form submitted:", l.Password)
 	
@@ -161,4 +179,17 @@ func (l *LoginForm) mockLogin(ctx app.Context) {
 		}
 		ctx.Update()
 	})
+}
+
+func (l *LoginForm) validate() error {
+    if l.Username == "" {
+        return fmt.Errorf("username is required")
+    }
+    if l.Password == "" {
+        return fmt.Errorf("password is required")
+    }
+    if len(l.Password) < 6 {
+        return fmt.Errorf("password must be at least 6 characters")
+    }
+    return nil
 }

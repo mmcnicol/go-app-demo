@@ -83,7 +83,7 @@ func (b *BasePage) Render() app.UI {
 }
 
 // handleLogin is the callback function passed to LoginForm
-func (b *BasePage) handleLogin(ctx app.Context, username, password string) (*models.User, error) {
+func (b *BasePage) handleLogin(ctx app.Context, username string, password string) (*models.User, error) {
 	// This is where you would integrate with your authentication system
 	// For now, we'll use a simple mock
 	
@@ -95,8 +95,8 @@ func (b *BasePage) handleLogin(ctx app.Context, username, password string) (*mod
 	if username == "demo" && password == "demo" {
 		user := &models.User{
 			Username: username,
-			Name:     "Demo User",
-			Email:    "demo@example.com",
+			Forename: "Demo",
+			Surname:  "User",
 		}
 		
 		// Set the user on BasePage
