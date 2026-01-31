@@ -18,11 +18,15 @@ type BasePage struct {
 	gopherDemographics       *models.GopherDemographics
 	recentGophers            []models.RecentGopherItem
 	labResults               []models.LabResultItem
-	// Remove: leftNavigation *components.LeftNavigation
+	
+	// Store navigation component instances
+	leftNavigationGopher    *components.LeftNavigation
+	leftNavigationNonGopher *components.LeftNavigation
 }
 
 func (b *BasePage) Render() app.UI {
     var content app.UI
+    var leftNav *components.LeftNavigation
 
 	// temp hack
 	user := &models.User{
@@ -61,20 +65,17 @@ func (b *BasePage) Render() app.UI {
 			app.Log("[BasePage Render] Non-gopher context, gopherDemographics is nil")
 			app.Log("[BasePage Render] Navigation items:", len(b.navItemsNonGopherContext))
 			
-			// Note: In Render(), we don't have access to ctx, so we can't update components here
-			// We'll update the navigation in OnMount and event handlers instead
-			
-			return &components.PageLayout{
-				ApplicationBanner: components.NewApplicationBanner(
-					"Gopher Portal",
-					b.handleQuickSearch, // Quick search handler
-					b.handleLogout,      // Logout handler
-				),
-				LeftNavigation:    components.NewLeftNavigation(b.navItemsNonGopherContext),
-				GopherBanner:      nil,
-				Body:              content,
-				PageFooter:        components.NewPageFooter("© 2024 Clinical Portal. All rights reserved."),
+			// Create or reuse non-gopher navigation
+			if b.leftNavigationNonGopher == nil {
+				app.Log("[BasePage Render] Creating new non-gopher navigation")
+				b.leftNavigationNonGopher = components.NewLeftNavigation(b.navItemsNonGopherContext)
+			} else {
+				app.Log("[BasePage Render] Reusing non-gopher navigation")
+				// Update items if needed
+				b.leftNavigationNonGopher.SetItems(nil, b.navItemsNonGopherContext)
 			}
+			leftNav = b.leftNavigationNonGopher
+			
 		} else {
 			// Contextual Routing Logic
 			switch b.activeID {
@@ -94,19 +95,38 @@ func (b *BasePage) Render() app.UI {
 			app.Log("[BasePage Render] Navigation items (gopher context):", len(b.navItemsGopherContext))
 			app.Log("[BasePage Render] Active ID:", b.activeID)
 			
-			return &components.PageLayout{
-				ApplicationBanner: components.NewApplicationBanner(
-					"Gopher Portal",
-					b.handleQuickSearch, // Quick search handler
-					b.handleLogout,      // Logout handler
-				),
-				LeftNavigation:    components.NewLeftNavigation(b.navItemsGopherContext),
-				GopherBanner:      components.NewGopherBanner(b.gopherDemographics),
-				Body:              content,
-				PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
+			// Create or reuse gopher navigation
+			if b.leftNavigationGopher == nil {
+				app.Log("[BasePage Render] Creating new gopher navigation")
+				b.leftNavigationGopher = components.NewLeftNavigation(b.navItemsGopherContext)
+			} else {
+				app.Log("[BasePage Render] Reusing gopher navigation")
+				// Update items if needed
+				b.leftNavigationGopher.SetItems(nil, b.navItemsGopherContext)
 			}
+			leftNav = b.leftNavigationGopher
+		}
+		
+		return &components.PageLayout{
+			ApplicationBanner: components.NewApplicationBanner(
+				"Gopher Portal",
+				b.handleQuickSearch, // Quick search handler
+				b.handleLogout,      // Logout handler
+			),
+			LeftNavigation:    leftNav,
+			GopherBanner:      b.getGopherBanner(),
+			Body:              content,
+			PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 		}
 	}
+}
+
+// Helper method to get appropriate gopher banner
+func (b *BasePage) getGopherBanner() app.UI {
+	if b.gopherDemographics != nil {
+		return components.NewGopherBanner(b.gopherDemographics)
+	}
+	return nil
 }
 
 // handleLogin is the callback function passed to LoginForm
@@ -143,11 +163,8 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 	return nil, fmt.Errorf("invalid credentials")
 }
 
-// Quick search handler in BasePage
 func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 	app.Log("[BasePage handleQuickSearch] Called with patientID:", patientID)
-	app.Log("[BasePage handleQuickSearch] Current gopherDemographics:", b.gopherDemographics)
-	app.Log("[BasePage handleQuickSearch] Current activeID:", b.activeID)
 	
 	if len(patientID) != 10 {
 		return fmt.Errorf("Patient ID must be exactly 10 digits")
@@ -174,16 +191,15 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 		// Update the navigation context
 		ctx.Dispatch(func(ctx app.Context) {
 			app.Log("[BasePage handleQuickSearch dispatch] Updating state")
-			app.Log("[BasePage handleQuickSearch dispatch] Old gopherDemographics:", b.gopherDemographics)
-			app.Log("[BasePage handleQuickSearch dispatch] Old activeID:", b.activeID)
 			
 			b.gopherDemographics = newGopherDemographics
 			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 			b.activeID = "LabResults" // Set default active item for gopher context
 			
-			app.Log("[BasePage handleQuickSearch dispatch] New gopherDemographics:", b.gopherDemographics)
-			app.Log("[BasePage handleQuickSearch dispatch] New activeID:", b.activeID)
-			app.Log("[BasePage handleQuickSearch dispatch] Navigation items updated to gopher context")
+			// Reset gopher navigation to get fresh state
+			b.leftNavigationGopher = nil
+			
+			app.Log("[BasePage handleQuickSearch dispatch] Navigation reset for gopher context")
 		})
 		
 		app.Log("[BasePage] Found patient:", patientID)
@@ -204,9 +220,14 @@ func (b *BasePage) handleLogout(ctx app.Context) {
 	b.recentGophers = nil
 	b.labResults = nil
 	
+	// Reset navigation components
+	b.leftNavigationGopher = nil
+	b.leftNavigationNonGopher = nil
+	
 	// Trigger re-render
 	ctx.Update()
 }
+
 
 // OnMount is called when the component is first loaded
 func (b *BasePage) OnMount(ctx app.Context) {
