@@ -92,7 +92,7 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 	}
 	
 	// Simple mock authentication
-	if username == "demo" && password == "demo" {
+	if username == "demo" && password == "demo123" {
 		user := &models.User{
 			Username: username,
 			Forename: "Demo",

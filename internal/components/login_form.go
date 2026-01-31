@@ -144,8 +144,8 @@ func (l *LoginForm) mockLogin(ctx app.Context) {
 		l.IsLoading = false
 
 		// Simple mock validation
-		if l.Username == "demo" && l.Password == "demo" {
-			l.Error = "Login successful (mock)! Username: demo, Password: demo"
+		if l.Username == "demo" && l.Password == "demo123" {
+			l.Error = "Login successful (mock)! Username: demo, Password: demo123"
 			l.Username = ""
 			l.Password = ""
 		} else {

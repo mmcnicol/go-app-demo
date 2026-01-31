@@ -82,14 +82,14 @@ func (g *ComponentGallery) Render() app.UI {
 				func() app.UI {
 					// Create a mock login handler for the gallery
 					mockHandler := func(ctx app.Context, username, password string) (*models.User, error) {
-						if username == "demo" && password == "demo" {
+						if username == "demo" && password == "demo123" {
 							return &models.User{
 								Username: username,
 								Forename: "Gallery",
 								Surname:  "User",
 							}, nil
 						}
-						return nil, fmt.Errorf("Try: demo/demo")
+						return nil, fmt.Errorf("Try: demo/demo123")
 					}
 					return components.NewLoginForm(mockHandler)
 				},
