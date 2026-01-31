@@ -168,6 +168,7 @@ func (l *LoginForm) validate() error {
 	return nil
 }
 
+/*
 // Alternative version using app.Handle for cleaner error handling
 func (l *LoginForm) performLoginV2(ctx app.Context) {
 	// Call the provided login handler
@@ -197,7 +198,9 @@ func (l *LoginForm) performLoginV2(ctx app.Context) {
 		}
 	})
 }
+*/
 
+/*
 // For v10, you can also use Defer with the context directly in some cases
 func (l *LoginForm) performLoginV3(ctx app.Context) {
 	// Defer is available on context but usually for cleanup
@@ -205,7 +208,7 @@ func (l *LoginForm) performLoginV3(ctx app.Context) {
 		app.Log("Login attempt completed")
 	})
 
-	user, err := l.OnLogin(ctx, l.Username, l.Password)
+	_, err := l.OnLogin(ctx, l.Username, l.Password)
 
 	// Use Dispatch for immediate UI updates
 	ctx.Dispatch(func(ctx app.Context) {
@@ -220,3 +223,4 @@ func (l *LoginForm) performLoginV3(ctx app.Context) {
 		}
 	})
 }
+*/
