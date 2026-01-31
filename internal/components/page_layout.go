@@ -7,20 +7,20 @@ import (
 
 type PageLayout struct {
     app.Compo
-    applicationBanner *ApplicationBanner
-    leftNavigation    *LeftNavigation
-    gopherBanner      *GopherBanner
+    ApplicationBanner *ApplicationBanner
+    LeftNavigation    *LeftNavigation
+    GopherBanner      *GopherBanner
     Body              app.UI // This acts like a "slot" or "children"
-    pageFooter        *PageFooter
+    PageFooter        *PageFooter
 }
 
 func NewPageLayout(body app.UI) *PageLayout {
     return &PageLayout{
-        applicationBanner: NewApplicationBanner("Application Banner"),
-        leftNavigation:    NewLeftNavigation([]models.NavItem{}, "", ""),
-        gopherBanner:      NewGopherBanner(models.GopherDemographics{}),
+        ApplicationBanner: NewApplicationBanner("Application Banner"),
+        LeftNavigation:    NewLeftNavigation([]models.NavItem{}, "", ""),
+        GopherBanner:      NewGopherBanner(models.GopherDemographics{}),
         Body:              body,
-        pageFooter:        NewPageFooter("Page Footer"),
+        PageFooter:        NewPageFooter("Page Footer"),
     }
 }
 
@@ -28,11 +28,11 @@ func NewPageLayout(body app.UI) *PageLayout {
 func NewPageLayoutWithComponents(appBanner *ApplicationBanner, nav *LeftNavigation, 
     gopherBanner *GopherBanner, body app.UI, footer *PageFooter) *PageLayout {
     return &PageLayout{
-        applicationBanner: appBanner,
-        leftNavigation:    nav,
-        gopherBanner:      gopherBanner,
+        ApplicationBanner: appBanner,
+        LeftNavigation:    nav,
+        GopherBanner:      gopherBanner,
         Body:              body,
-        pageFooter:        footer,
+        PageFooter:        footer,
     }
 }
 

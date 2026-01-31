@@ -1,66 +1,37 @@
+// base.go
 package pages
 
 import (
+	"time"
+	
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"go-app-demo/internal/components"
 	"go-app-demo/internal/models"
 )
 
-/*
-
-# Key Features of this Layout:
-* Flex-Shrink Control: The banner and footer are set to stay a fixed height, while the app-body and content-area use flex: 1 to expand and contract based on the browser window size.
-* Independent Scrolling: The .main-content has overflow-y: auto, meaning the sidebar stays fixed in place while you scroll through a long medical form.
-* Component Architecture: By passing Navigation and Body as app.UI fields, you can swap the content easily as the user clicks different items in the sidebar.
-
-*/
-
 type BasePage struct {
 	app.Compo
-	navItemsGopherContext []models.NavItem
+	navItemsGopherContext    []models.NavItem
 	navItemsNonGopherContext []models.NavItem
-	activeID string
-	expandedSecID string
-	user models.User
-	gopherDemographics models.GopherDemographics
-	recentGophers []models.RecentGopherItem
-	labResults []models.LabResultItem
+	activeID                 string
+	expandedSecID            string
+	user                     *models.User
+	gopherDemographics       *models.GopherDemographics
+	recentGophers            []models.RecentGopherItem
+	labResults               []models.LabResultItem
 }
-
-/*
-func (b *BasePage) Render() app.UI {
-    // 1. Create the Sidebar
-    nav := &LeftNavigation{
-        Items:        b.menuItems,
-        ActiveItemID: b.activeID,
-    }
-
-    // 2. Create the Form/Content
-    content := app.Div().Body(
-        app.H3().Text("Patient Discharge Form"),
-        // ... your form inputs here ...
-    )
-
-    // 3. Assemble the Page
-    return &MainLayout{
-        Navigation:       nav,
-        Body:             content,
-        ShowDemographics: true,
-        CurrentPatient:   b.patient,
-    }
-}
-*/
 
 func (b *BasePage) Render() app.UI {
     var content app.UI
 
+	// Check if user is nil (using pointer)
 	if b.user == nil {
-		return &PageLayout{
-			applicationBanner: NewApplicationBanner("Gopher Portal"),
-			leftNavigation:    nil,
-			gopherBanner:      nil,
-			Body:              NewLoginForm(),
-			pageFooter:        NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
+		return &components.PageLayout{
+			ApplicationBanner: components.NewApplicationBanner("Gopher Portal"),
+			LeftNavigation:    nil,
+			GopherBanner:      nil,
+			Body:              components.NewLoginForm(),
+			PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 		}
 	} else {
 		if b.gopherDemographics == nil {
@@ -68,42 +39,42 @@ func (b *BasePage) Render() app.UI {
 			switch b.activeID {
 			case "RecentGophers":
 				b.recentGophers = b.fetchRecentGophers()
-				content = NewRecentGophers(b.recentGophers)
+				content = components.NewRecentGophers(b.recentGophers)
 			default:
-				content = &NotFoundComponent{}
+				content = &components.NotFoundComponent{}
 			}
 			b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
 			b.activeID = "RecentGophers"
 			b.expandedSecID = "GophersLists"
-			return &PageLayout{
-				applicationBanner: NewApplicationBanner("Gopher Portal"),
-				leftNavigation:    NewLeftNavigation(b.navItemsNonGopherContext, b.activeID, b.expandedSecID),
-				gopherBanner:      nil,
+			return &components.PageLayout{
+				ApplicationBanner: components.NewApplicationBanner("Gopher Portal"),
+				LeftNavigation:    components.NewLeftNavigation(b.navItemsNonGopherContext, b.activeID, b.expandedSecID),
+				GopherBanner:      nil,
 				Body:              content,
-				pageFooter:        NewPageFooter("© 2024 Clinical Portal. All rights reserved."),
+				PageFooter:        components.NewPageFooter("© 2024 Clinical Portal. All rights reserved."),
 			}
 		} else {
 			// Contextual Routing Logic
 			switch b.activeID {
 			case "RecentGophers":
 				b.recentGophers = b.fetchRecentGophers()
-				content = NewRecentGophers(b.recentGophers)
+				content = components.NewRecentGophers(b.recentGophers)
 			case "LabResults":
 				b.labResults = b.fetchLabResults()
-				content = NewLabResults(b.labResults)
+				content = components.NewLabResults(b.labResults)
 			default:
-				content = &NotFoundComponent{}
+				content = &components.NotFoundComponent{}
 			}
 			b.gopherDemographics = b.fetchGophersDemographics()
-			b.navItemsNonGopherContext = b.fetchNavItemsGopherContext()
+			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 			b.activeID = "LabResults"
 			b.expandedSecID = "GophersRecords"
-			return &PageLayout{
-				applicationBanner: NewApplicationBanner("Gopher Portal"),
-				leftNavigation:    NewLeftNavigation(b.navItemsPatientContext, b.activeID, b.expandedSecID),
-				gopherBanner:      NewGopherBanner(b.gopherDemographics),
+			return &components.PageLayout{
+				ApplicationBanner: components.NewApplicationBanner("Gopher Portal"),
+				LeftNavigation:    components.NewLeftNavigation(b.navItemsGopherContext, b.activeID, b.expandedSecID),
+				GopherBanner:      components.NewGopherBanner(b.gopherDemographics),
 				Body:              content,
-				pageFooter:        NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
+				PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 			}
 		}
 	}
@@ -111,45 +82,39 @@ func (b *BasePage) Render() app.UI {
 
 // OnMount is called when the component is first loaded
 func (b *BasePage) OnMount(ctx app.Context) {
-	/*
-    // Optional: Initialize with an empty patient or fetch from session
-    ctx.SetState("current-patient", Patient{})
-	*/
-
-	/*
-	d.dischargeForm = models.DischargeForm{
-		ID:   "MRN-8829",
-		Name: "John Doe",
-	}
+    /*
+	// Initialize user state - check if user is logged in
+    // This is just a placeholder - you'd typically check session/cookie
+    // For now, we'll set a mock user for testing
+    b.user = &models.User{
+        ID:    "user-001",
+        Name:  "Demo User",
+        Email: "demo@example.com",
+    }
+    
+    // Initialize other data
+    b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
+    b.navItemsGopherContext = b.fetchNavItemsGopherContext()
+    b.activeID = "RecentGophers"
+    b.expandedSecID = "GophersLists"
+    
+    ctx.Update()
 	*/
 }
 
 // OnNav is called on Browser Refresh button click or Back button click
 func (b *BasePage) OnNav(ctx app.Context) {
-    /*
-	// Retrieve the object from state
-    ctx.GetState("current-patient", &d.patient)
-    d.Update()
-	*/
+
+    b.activeID = "RecentGophers"
+    ctx.Update()
 }
 
-func (b *BasePage) loadPatientData(id string) {
-    // Simulation: would normally be a database lookup
-    if id == "MRN-8829" {
-        d.dischargeForm = models.DischargeForm{
-			ID:   "MRN-8829",
-			Name: "John Doe",
-		}
-    }
-    d.Update()
-}
-
-func (b *BasePage) fetchGophersDemographics() []models.GopherDemographics {
-	// mock
-	return models.GopherDemographics{
-		GopherId:         "gopher-001",
-		Name:             "Alice",
-		DateOfBirth:      time.Date(1990, 1, 15, 0, 0, 0, 0, time.UTC),
+func (b *BasePage) fetchGophersDemographics() *models.GopherDemographics {
+	// mock - return pointer
+	return &models.GopherDemographics{
+		GopherId:    "gopher-001",
+		Name:        "Alice",
+		DateOfBirth: time.Date(1990, 1, 15, 0, 0, 0, 0, time.UTC),
 	}
 }
 
@@ -182,82 +147,139 @@ func (b *BasePage) fetchLabResults() []models.LabResultItem {
 	return []models.LabResultItem{
 		{
 			ID:         "rpt-001",
-			Subject:             "Blood",
-			//ReportDate:      time.Date(2025, 1, 15, 0, 0, 0, 0, time.UTC),
+			Subject:    "Blood",
 			ReportDate: time.Now().Add(-24 * time.Hour),
 		},
 		{
 			ID:         "rpt-003",
-			Subject:             "Pancreas",
-			//ReportDate:      time.Date(2024, 5, 20, 0, 0, 0, 0, time.UTC),
+			Subject:    "Pancreas",
 			ReportDate: time.Now().Add(-2 * time.Hour),
 		},
 		{
 			ID:         "rpt-002",
-			Subject:             "Liver",
-			//ReportDate:      time.Date(2023, 10, 5, 0, 0, 0, 0, time.UTC),
+			Subject:    "Liver",
 			ReportDate: time.Now().Add(-5 * time.Hour),
 		},
 	}
 }
 
 func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
-	return []NavItem{
+	return []models.NavItem{
 		{
-			ID:    "MySettings",
-			Label: "My Settings",
-			Icon:  "fas fa-cog",
-			IsLoading: false, // Example of eager loading state
+			ID:        "MySettings",
+			Label:     "My Settings",
+			Icon:      "fas fa-cog",
+			IsLoading: false,
+			Route:     "/settings",
 		},
 		{
-			ID:    "GopherLists",
-			Label: "Gopher Lists",
-			Icon:  "fas fa-user-injured",
-			IsDefaultExpanded: true, // This section starts open
-			Children: []NavItem{
-				{ID: "RecentGophers", Label: "Recent Gophers", Icon: "fas fa-list", IsLoading: true },
-				{ID: "PharmacyDischargeList", Label: "Pharmacy Discharge List", Icon: "fas fa-plus-circle", IsLoading: true },
+			ID:                "GophersLists",
+			Label:             "Gopher Lists",
+			Icon:              "fas fa-user-injured",
+			IsDefaultExpanded: true,
+			Route:             "",
+			Children: []models.NavItem{
+				{
+					ID:        "RecentGophers",
+					Label:     "Recent Gophers",
+					Icon:      "fas fa-list",
+					IsLoading: false,
+					Route:     "/recent-gophers",
+				},
+				{
+					ID:        "PharmacyDischargeList",
+					Label:     "Pharmacy Discharge List",
+					Icon:      "fas fa-plus-circle",
+					IsLoading: false,
+					Route:     "/pharmacy-discharge",
+				},
 			},
 		},
 		{
-			ID:    "GopherSearch",
-			Label: "Gopher Search",
-			Icon:  "fas fa-chart-line",
+			ID:        "GopherSearch",
+			Label:     "Gopher Search",
+			Icon:      "fas fa-search",
+			IsLoading: false,
+			Route:     "/search",
 		},
 	}
 }
 
 func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
-	return []NavItem{
+	return []models.NavItem{
 		{
-			ID:    "MySettings",
-			Label: "My Settings",
-			Icon:  "fas fa-cog",
-			IsLoading: false, // Example of eager loading state
+			ID:        "MySettings",
+			Label:     "My Settings",
+			Icon:      "fas fa-cog",
+			IsLoading: false,
+			Route:     "/settings",
 		},
 		{
-			ID:    "GopherLists",
-			Label: "Gopher Lists",
-			Icon:  "fas fa-user-injured",
+			ID:                "GophersLists",
+			Label:             "Gopher Lists",
+			Icon:              "fas fa-user-injured",
 			IsDefaultExpanded: false,
-			Children: []NavItem{
-				{ID: "RecentGophers", Label: "Recent Gophers", Icon: "fas fa-list", IsLoading: true },
-				{ID: "PharmacyDischargeList", Label: "Pharmacy Discharge List", Icon: "fas fa-plus-circle", IsLoading: true },
+			Route:             "",
+			Children: []models.NavItem{
+				{
+					ID:        "RecentGophers",
+					Label:     "Recent Gophers",
+					Icon:      "fas fa-list",
+					IsLoading: false,
+					Route:     "/recent-gophers",
+				},
+				{
+					ID:        "PharmacyDischargeList",
+					Label:     "Pharmacy Discharge List",
+					Icon:      "fas fa-plus-circle",
+					IsLoading: false,
+					Route:     "/pharmacy-discharge",
+				},
 			},
 		},
 		{
-			ID:    "GopherSearch",
-			Label: "Gopher Search",
-			Icon:  "fas fa-chart-line",
+			ID:        "GopherSearch",
+			Label:     "Gopher Search",
+			Icon:      "fas fa-search",
+			IsLoading: false,
+			Route:     "/search",
 		},
 		{
-			ID:    "GopherRecords",
-			Label: "Gopher Records",
-			Icon:  "fas fa-user-injured",
+			ID:                "GophersRecords",
+			Label:             "Gopher Records",
+			Icon:              "fas fa-user-injured",
 			IsDefaultExpanded: true,
-			Children: []NavItem{
-				{ID: "LabResults", Label: "Lab Results", Icon: "fas fa-list", IsLoading: true },
+			Route:             "",
+			Children: []models.NavItem{
+				{
+					ID:        "LabResults",
+					Label:     "Lab Results",
+					Icon:      "fas fa-list",
+					IsLoading: false,
+					Route:     "/lab-results",
+				},
 			},
 		},
 	}
+}
+
+// Login method (example)
+func (b *BasePage) Login(username, password string) bool {
+    // Mock login - replace with actual authentication
+    if username == "demo" && password == "demo" {
+        b.user = &models.User{
+            ID:    "user-001",
+            Name:  "Demo User",
+            Email: "demo@example.com",
+        }
+        //ctx.Update()
+        return true
+    }
+    return false
+}
+
+// Logout method
+func (b *BasePage) Logout() {
+    b.user = nil
+    //ctx.Update()
 }
