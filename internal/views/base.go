@@ -265,7 +265,8 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 
 // Login method (example)
 func (b *BasePage) Login(username, password string) bool {
-    // Mock login - replace with actual authentication
+    /*
+	// Mock login - replace with actual authentication
     if username == "demo" && password == "demo" {
         b.user = &models.User{
             ID:    "user-001",
@@ -275,6 +276,7 @@ func (b *BasePage) Login(username, password string) bool {
         //ctx.Update()
         return true
     }
+	*/
     return false
 }
 
