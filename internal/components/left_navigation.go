@@ -15,36 +15,53 @@ type LeftNavigation struct {
 // NewLeftNavigation creates a new LeftNavigation component
 func NewLeftNavigation(items []models.NavItem) *LeftNavigation {
 	app.Log("[LeftNavigation New] Creating with", len(items), "items")
-	return &LeftNavigation{
+	
+	nav := &LeftNavigation{
 		Items: items,
 	}
+	
+	// Initialize state immediately in constructor, not in OnMount
+	nav.initializeState()
+	
+	return nav
 }
 
-// OnMount handles initialization including default expanded sections
-func (n *LeftNavigation) OnMount(ctx app.Context) {
-	app.Log("[LeftNavigation OnMount] Called")
-	app.Log("[LeftNavigation OnMount] Items count:", len(n.Items))
+// initializeState sets initial ActiveItemID and ExpandedSecID based on items
+func (n *LeftNavigation) initializeState() {
+	app.Log("[LeftNavigation initializeState] Called")
 	
-	// Set initial ActiveItemID based on the first child item or first item
+	// Set initial ActiveItemID based on the first leaf item (non-parent)
 	if len(n.Items) > 0 {
-		// Find first leaf item (non-parent) to set as active
 		if firstLeaf := n.findFirstLeafItem(n.Items); firstLeaf != nil {
 			n.ActiveItemID = firstLeaf.ID
-			app.Log("[LeftNavigation OnMount] Setting initial ActiveItemID:", n.ActiveItemID)
+			app.Log("[LeftNavigation initializeState] Setting initial ActiveItemID:", n.ActiveItemID)
 		}
 	}
 	
 	// Find and expand sections with IsDefaultExpanded = true
 	for _, item := range n.Items {
-		app.Log("[LeftNavigation OnMount] Checking item ID:", item.ID, "IsDefaultExpanded:", item.IsDefaultExpanded)
+		app.Log("[LeftNavigation initializeState] Checking item ID:", item.ID, "IsDefaultExpanded:", item.IsDefaultExpanded)
 		if item.IsDefaultExpanded && len(item.Children) > 0 {
 			n.ExpandedSecID = item.ID
-			app.Log("[LeftNavigation OnMount] Setting ExpandedSecID to:", item.ID, "based on IsDefaultExpanded")
+			app.Log("[LeftNavigation initializeState] Setting ExpandedSecID to:", item.ID, "based on IsDefaultExpanded")
 			break // Only expand one section by default
 		}
 	}
 	
-	app.Log("[LeftNavigation OnMount] Final state - ActiveItemID:", n.ActiveItemID, "ExpandedSecID:", n.ExpandedSecID)
+	app.Log("[LeftNavigation initializeState] Final state - ActiveItemID:", n.ActiveItemID, "ExpandedSecID:", n.ExpandedSecID)
+}
+
+// OnMount handles additional initialization if needed
+func (n *LeftNavigation) OnMount(ctx app.Context) {
+	app.Log("[LeftNavigation OnMount] Called")
+	app.Log("[LeftNavigation OnMount] Current ActiveItemID:", n.ActiveItemID)
+	app.Log("[LeftNavigation OnMount] Current ExpandedSecID:", n.ExpandedSecID)
+	
+	// If state wasn't initialized (shouldn't happen with new constructor), initialize it
+	if n.ActiveItemID == "" && n.ExpandedSecID == "" {
+		app.Log("[LeftNavigation OnMount] State not initialized, initializing now")
+		n.initializeState()
+	}
 }
 
 // Helper to find first leaf item (non-parent) in the navigation tree
@@ -68,8 +85,9 @@ func (n *LeftNavigation) OnNav(ctx app.Context) {
 	currPath := ctx.Page().URL().Path
 
 	// Find matching item in the navigation tree
-	n.findAndSetActiveItem(currPath, n.Items)
-	ctx.Update()
+	if n.findAndSetActiveItem(currPath, n.Items) {
+		ctx.Update()
+	}
 }
 
 func (n *LeftNavigation) Render() app.UI {
@@ -233,15 +251,8 @@ func (n *LeftNavigation) SetItems(ctx app.Context, items []models.NavItem) {
 	app.Log("[LeftNavigation SetItems] Called with", len(items), "items")
 	n.Items = items
 	
-	// Reset expansion based on new items' IsDefaultExpanded
-	n.ExpandedSecID = ""
-	for _, item := range items {
-		if item.IsDefaultExpanded && len(item.Children) > 0 {
-			n.ExpandedSecID = item.ID
-			app.Log("[LeftNavigation SetItems] Setting ExpandedSecID to:", item.ID, "based on IsDefaultExpanded")
-			break
-		}
-	}
+	// Re-initialize state based on new items
+	n.initializeState()
 	
 	ctx.Update()
 }
