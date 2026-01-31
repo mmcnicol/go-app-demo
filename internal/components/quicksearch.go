@@ -161,10 +161,15 @@ func (q *QuickSearch) performSearch(ctx app.Context) {
 		return
 	}
 	
-	// Success - clear the search term
+	// Success - clear the search term and update navigation
 	ctx.Async(func() {
 		q.SearchTerm = ""
 		q.Error = "Patient found! Loading..."
+		
+		// Update application state to trigger navigation change
+		// This assumes you have a state management system
+		q.updateNavigation(ctx)
+		
 		ctx.Update()
 	})
 }
