@@ -196,7 +196,7 @@ var mockNavItemsNonGopherContext = []models.NavItem{
 }
 
 // Define mock NavItems (GopherContext)
-var mockNavItemsGopherContext = []models.[]NavItem{
+var mockNavItemsGopherContext = []models.NavItem{
     {
         ID:    "MySettings",
         Label: "My Settings",
