@@ -55,7 +55,7 @@ func (b *BasePage) Render() app.UI {
     var content app.UI
 
 	if b.user == nil {
-		return &models.PageLayout{
+		return &PageLayout{
 			applicationBanner: NewApplicationBanner("Gopher Portal"),
 			leftNavigation:    nil,
 			gopherBanner:      nil,
@@ -63,7 +63,7 @@ func (b *BasePage) Render() app.UI {
 			pageFooter:        NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 		}
 	} else {
-		if b.patient == nil {
+		if b.gopherDemographics == nil {
 			// Contextual Routing Logic
 			switch b.activeID {
 			case "RecentGophers":
