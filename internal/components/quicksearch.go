@@ -93,9 +93,11 @@ func (q *QuickSearch) Render() app.UI {
 
 func (q *QuickSearch) onSearchTermChange(ctx app.Context, e app.Event) {
 	value := ctx.JSSrc().Get("value").String()
+	app.Log("[QuickSearch] onSearchTermChange called, value:", value)
 	
 	// Only allow numeric input (for patient IDs)
 	if !q.isValidInput(value) {
+		app.Log("[QuickSearch] Invalid input - not numeric")
 		// If invalid, keep the old value
 		ctx.Update()
 		return
@@ -103,32 +105,40 @@ func (q *QuickSearch) onSearchTermChange(ctx app.Context, e app.Event) {
 	
 	// Limit to max length
 	if len(value) > q.MaxLength {
+		app.Log("[QuickSearch] Truncating value from", len(value), "to", q.MaxLength, "characters")
 		value = value[:q.MaxLength]
 	}
 	
 	q.SearchTerm = value
 	q.Error = "" // Clear error when user types
+	app.Log("[QuickSearch] Search term updated to:", q.SearchTerm)
 	ctx.Update()
 }
 
 func (q *QuickSearch) onKeyPress(ctx app.Context, e app.Event) {
-	// Allow Enter key to trigger search
 	keyCode := e.Get("keyCode").Int()
+	app.Log("[QuickSearch] onKeyPress called, keyCode:", keyCode)
+	// Allow Enter key to trigger search
 	if keyCode == 13 { // Enter key
+		app.Log("[QuickSearch] Enter key pressed, triggering search")
 		e.PreventDefault()
 		q.onSearchClick(ctx, e)
 	}
 }
 
 func (q *QuickSearch) onSearchClick(ctx app.Context, e app.Event) {
+	app.Log("[QuickSearch] onSearchClick called")
 	e.PreventDefault()
 	
 	// Validate input
 	if err := q.validate(); err != nil {
+		app.Log("[QuickSearch] Validation failed:", err.Error())
 		q.Error = err.Error()
 		ctx.Update()
 		return
 	}
+	
+	app.Log("[QuickSearch] Validation passed, search term:", q.SearchTerm)
 	
 	// Clear any previous error
 	q.Error = ""
@@ -137,14 +147,18 @@ func (q *QuickSearch) onSearchClick(ctx app.Context, e app.Event) {
 	
 	// If we have a search handler, use it
 	if q.OnSearch != nil {
+		app.Log("[QuickSearch] Starting performSearch")
 		go q.performSearch(ctx)
 	} else {
+		app.Log("[QuickSearch] Starting mockSearch (no handler provided)")
 		go q.mockSearch(ctx)
 	}
 }
 
 func (q *QuickSearch) performSearch(ctx app.Context) {
+	app.Log("[QuickSearch] performSearch started")
 	defer func() {
+		app.Log("[QuickSearch] performSearch completed, setting isLoading=false")
 		ctx.Async(func() {
 			q.IsLoading = false
 			ctx.Update()
@@ -152,8 +166,10 @@ func (q *QuickSearch) performSearch(ctx app.Context) {
 	}()
 	
 	// Call the provided search handler
+	app.Log("[QuickSearch] Calling OnSearch handler")
 	err := q.OnSearch(ctx, q.SearchTerm)
 	if err != nil {
+		app.Log("[QuickSearch] OnSearch returned error:", err.Error())
 		ctx.Async(func() {
 			q.Error = err.Error()
 			ctx.Update()
@@ -161,20 +177,20 @@ func (q *QuickSearch) performSearch(ctx app.Context) {
 		return
 	}
 	
-	// Success - clear the search term and update navigation
+	app.Log("[QuickSearch] Search successful, updating UI")
+	
+	// Success - clear the search term
 	ctx.Async(func() {
 		q.SearchTerm = ""
 		q.Error = "Patient found! Loading..."
-		
-		// Update application state to trigger navigation change
-		// This assumes you have a state management system
-		q.updateNavigation(ctx)
-		
+		app.Log("[QuickSearch] UI updated: search term cleared, loading message set")
 		ctx.Update()
 	})
 }
 
 func (q *QuickSearch) mockSearch(ctx app.Context) {
+	app.Log("[QuickSearch] mockSearch started")
+	
 	// Simulate network delay
 	// In a real app, this would be an API call
 	
@@ -188,13 +204,17 @@ func (q *QuickSearch) mockSearch(ctx app.Context) {
 	
 	ctx.Async(func() {
 		q.IsLoading = false
+		originalTerm := q.SearchTerm // Save before clearing
 		q.SearchTerm = ""
-		q.Error = fmt.Sprintf("Mock search for patient ID: %s completed", q.SearchTerm)
+		q.Error = fmt.Sprintf("Mock search for patient ID: %s completed", originalTerm)
+		app.Log("[QuickSearch] mockSearch completed, message:", q.Error)
 		ctx.Update()
 	})
 }
 
 func (q *QuickSearch) validate() error {
+	app.Log("[QuickSearch] validate called, length:", len(q.SearchTerm), "min:", q.MinLength, "max:", q.MaxLength)
+	
 	if len(q.SearchTerm) < q.MinLength {
 		return fmt.Errorf("Patient ID must be exactly %d digits", q.MinLength)
 	}
@@ -208,6 +228,7 @@ func (q *QuickSearch) validate() error {
 		return fmt.Errorf("Patient ID must contain only numbers")
 	}
 	
+	app.Log("[QuickSearch] validate passed")
 	return nil
 }
 
@@ -223,12 +244,14 @@ func (q *QuickSearch) isValidInput(input string) bool {
 
 // SetSearchTerm allows programmatically setting the search term
 func (q *QuickSearch) SetSearchTerm(ctx app.Context, term string) {
+	app.Log("[QuickSearch] SetSearchTerm called:", term)
 	q.SearchTerm = term
 	ctx.Update()
 }
 
 // ClearSearch clears the search term and error
 func (q *QuickSearch) ClearSearch(ctx app.Context) {
+	app.Log("[QuickSearch] ClearSearch called")
 	q.SearchTerm = ""
 	q.Error = ""
 	ctx.Update()

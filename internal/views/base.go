@@ -58,6 +58,10 @@ func (b *BasePage) Render() app.UI {
 			b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
 			b.activeID = "RecentGophers"
 			b.expandedSecID = "GophersLists"
+			
+			app.Log("[BasePage Render] Non-gopher context, gopherDemographics is nil")
+			app.Log("[BasePage Render] Navigation items:", len(b.navItemsNonGopherContext))
+			
 			return &components.PageLayout{
 				ApplicationBanner: components.NewApplicationBanner(
 					"Gopher Portal",
@@ -85,6 +89,11 @@ func (b *BasePage) Render() app.UI {
 			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 			b.activeID = "LabResults"
 			b.expandedSecID = "GophersRecords"
+			
+			app.Log("[BasePage Render] Gopher context, gopherDemographics exists")
+			app.Log("[BasePage Render] Navigation items (gopher context):", len(b.navItemsGopherContext))
+			app.Log("[BasePage Render] Active ID:", b.activeID, "Expanded Section ID:", b.expandedSecID)
+			
 			return &components.PageLayout{
 				ApplicationBanner: components.NewApplicationBanner(
 					"Gopher Portal",
@@ -137,6 +146,10 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 
 // Quick search handler in BasePage
 func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
+	app.Log("[BasePage handleQuickSearch] Called with patientID:", patientID)
+	app.Log("[BasePage handleQuickSearch] Current gopherDemographics:", b.gopherDemographics)
+	app.Log("[BasePage handleQuickSearch] Current activeID:", b.activeID)
+	
 	if len(patientID) != 10 {
 		return fmt.Errorf("Patient ID must be exactly 10 digits")
 	}
@@ -148,7 +161,7 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 		}
 	}
 	
-	app.Log("Quick searching for patient:", patientID)
+	app.Log("[BasePage] Quick searching for patient:", patientID)
 	
 	// In a real app, you would:
 	// 1. Search for the patient in your database
@@ -158,13 +171,33 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 	
 	// For demo, just show a message
 	ctx.Async(func() {
-
+		app.Log("[BasePage handleQuickSearch async] Starting search simulation")
+		
 		time.Sleep(1 * time.Second)
 		
 		newGopherDemographics := b.fetchGophersDemographics()
-
+		app.Log("[BasePage handleQuickSearch async] Fetched demographics:", newGopherDemographics)
+		
+		// CRITICAL: Update the navigation context
+		// We need to update the navigation items to gopher context
+		ctx.Dispatch(func(ctx app.Context) {
+			app.Log("[BasePage handleQuickSearch dispatch] Updating state")
+			app.Log("[BasePage handleQuickSearch dispatch] Old gopherDemographics:", b.gopherDemographics)
+			app.Log("[BasePage handleQuickSearch dispatch] Old activeID:", b.activeID)
+			
+			b.gopherDemographics = newGopherDemographics
+			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
+			b.activeID = "LabResults" // Set default active item for gopher context
+			b.expandedSecID = "GophersRecords" // Expand the gopher records section
+			
+			app.Log("[BasePage handleQuickSearch dispatch] New gopherDemographics:", b.gopherDemographics)
+			app.Log("[BasePage handleQuickSearch dispatch] New activeID:", b.activeID)
+			app.Log("[BasePage handleQuickSearch dispatch] New expandedSecID:", b.expandedSecID)
+			app.Log("[BasePage handleQuickSearch dispatch] Navigation items updated to gopher context")
+		})
+		
 		// You could show a notification or update state
-		app.Log("Found patient:", patientID)
+		app.Log("[BasePage] Found patient:", patientID)
 		
 		// Example: Navigate to patient view
 		// ctx.Navigate("/patient/" + patientID)
@@ -172,11 +205,6 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 		// Or update current view
 		// b.loadPatientData(patientID)
 		//ctx.Update()
-
-		ctx.Dispatch(func(ctx app.Context) {
-			b.gopherDemographics = newGopherDemographics
-			// The table automatically re-renders now
-		})
 	})
 	
 	return nil
@@ -184,7 +212,7 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 
 // Logout handler in BasePage
 func (b *BasePage) handleLogout(ctx app.Context) {
-	app.Log("Logging out user")
+	app.Log("[BasePage] Logging out user")
 	
 	// Clear user session
 	b.user = nil
@@ -200,6 +228,7 @@ func (b *BasePage) handleLogout(ctx app.Context) {
 
 // OnMount is called when the component is first loaded
 func (b *BasePage) OnMount(ctx app.Context) {
+	app.Log("[BasePage OnMount] Initializing")
 	// We could check for existing session/cookie here
 	// For demo purposes, we'll start with no user logged in
 	//b.user = nil
@@ -209,11 +238,21 @@ func (b *BasePage) OnMount(ctx app.Context) {
 		Surname:  "Cheating",
 	}
 
+	// Initialize navigation items
+	b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
+	b.navItemsGopherContext = b.fetchNavItemsGopherContext()
+	b.activeID = "RecentGophers"
+	b.expandedSecID = "GophersLists"
+	
+	app.Log("[BasePage OnMount] Navigation initialized")
+	app.Log("[BasePage OnMount] User set:", b.user)
+	
 	ctx.Update()
 }
 
 // OnNav is called on Browser Refresh button click or Back button click
 func (b *BasePage) OnNav(ctx app.Context) {
+	app.Log("[BasePage OnNav] Navigation event")
 	// We could check for existing session/cookie here
 	// For demo purposes, we'll start with no user logged in
 	b.user = nil
@@ -222,6 +261,7 @@ func (b *BasePage) OnNav(ctx app.Context) {
 }
 
 func (b *BasePage) fetchGophersDemographics() *models.GopherDemographics {
+	app.Log("[BasePage] fetchGophersDemographics called")
 	// mock - return pointer
 	return &models.GopherDemographics{
 		GopherId:    "gopher-001",
@@ -231,6 +271,7 @@ func (b *BasePage) fetchGophersDemographics() *models.GopherDemographics {
 }
 
 func (b *BasePage) fetchRecentGophers() []models.RecentGopherItem {
+	app.Log("[BasePage] fetchRecentGophers called")
 	// mock
 	return []models.RecentGopherItem{
 		{
@@ -255,6 +296,7 @@ func (b *BasePage) fetchRecentGophers() []models.RecentGopherItem {
 }
 
 func (b *BasePage) fetchLabResults() []models.LabResultItem {
+	app.Log("[BasePage] fetchLabResults called")
 	// mock
 	return []models.LabResultItem{
 		{
@@ -276,6 +318,7 @@ func (b *BasePage) fetchLabResults() []models.LabResultItem {
 }
 
 func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
+	app.Log("[BasePage] fetchNavItemsNonGopherContext called")
 	return []models.NavItem{
 		{
 			ID:        "MySettings",
@@ -318,6 +361,7 @@ func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
 }
 
 func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
+	app.Log("[BasePage] fetchNavItemsGopherContext called")
 	return []models.NavItem{
 		{
 			ID:        "MySettings",
