@@ -211,6 +211,12 @@ func (n *LeftNavigation) handleItemClick(ctx app.Context, item models.NavItem) {
 			// because ExpandedSecID can only hold one value.
 			app.Log("[LeftNavigation handleItemClick] Opening section:", item.ID)
 			n.ExpandedSecID = item.ID
+			n.ActiveItemID = n.GetFirstChildID(item)
+			if n.ActiveItemID == "" {
+				app.Log("[LeftNavigation handleItemClick] n.ActiveItemID is empty string!")
+			} else {
+				app.Log("[LeftNavigation handleItemClick] n.ActiveItemID set to:", n.ActiveItemID)
+			}
 		}
 	} else {
 		// 2. If it's a clickable item, mark as selected
@@ -234,6 +240,14 @@ func (n *LeftNavigation) handleItemClick(ctx app.Context, item models.NavItem) {
 		app.Log("[LeftNavigation handleItemClick async] Triggering update")
 		ctx.Update()
 	})
+}
+
+// GetFirstChildID returns the ID of the first child NavItem if it exists
+func (n *LeftNavigation) GetFirstChildID(item models.NavItem) string {
+    if len(item.Children) > 0 {
+        return item.Children[0].ID
+    }
+    return "" // No children
 }
 
 // Helper method to recursively find and set active item
