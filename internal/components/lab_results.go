@@ -3,6 +3,8 @@ package components
 import (
     "github.com/maxence-charriere/go-app/v10/pkg/app"
     "go-app-demo/internal/models"
+    "strings"
+    "sort"
 )
 
 // Usage:
@@ -42,9 +44,14 @@ func (l *LabResults) Render() app.UI {
 			),
 			// Table Body with Rows
 			app.TBody().Body(
-				app.If(r.Loading, func() app.UI {
+				app.If(l.Loading, func() app.UI {
 					return app.Tr().Body(
 						app.Td().ColSpan(3).Text("Loading..."),
+					)
+				}),
+                app.If(len(l.labResults)==0, func() app.UI {
+					return app.Tr().Body(
+						app.Td().ColSpan(3).Text("No Results Found."),
 					)
 				}),
 				app.Range(l.labResults).Slice(func(i int) app.UI {
@@ -96,9 +103,9 @@ func (l *LabResults) sortData() {
         
         switch l.SortBy {
         case "ID":
-            less = strings.ToLower(a.GopherId) < strings.ToLower(b.GopherId)
+            less = strings.ToLower(a.ID) < strings.ToLower(b.ID)
         case "Subject":
-            less = strings.ToLower(a.Name) < strings.ToLower(b.Name)
+            less = strings.ToLower(a.Subject) < strings.ToLower(b.Subject)
         case "ReportDate":
             less = a.ReportDate.Before(b.ReportDate)
         default:
