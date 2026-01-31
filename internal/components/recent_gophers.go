@@ -82,7 +82,7 @@ func (r *RecentGophers) handleSort(ctx app.Context, field string) {
         r.SortOrder = "asc"
     }
     t.sortData(ctx)
-    r.Update() // Trigger re-render
+    ctx.Update() // Trigger re-render
 }
 
 func (r *RecentGophers) sortData() {
@@ -119,14 +119,14 @@ func (r *RecentGophers) sortData() {
 
 func (r *RecentGophers) OnMount(ctx app.Context) {
     r.Loading = true
-    r.Update()
+    ctx.Update()
 
     r.SortBy = "DateLastAccessed"
     r.SortOrder = "desc"
     r.sortData()
     
     r.Loading = false
-    r.Update()
+    ctx.Update()
 }
 
 /*
@@ -137,7 +137,7 @@ func (r *RecentGophers) onPatientClick(ctx app.Context, patientID string) {
 */
 
 // In the Patient List component
-func (r *RecentGophers) onSelect(ctx app.Context, selected Patient) {
+func (r *RecentGophers) onSelect(ctx app.Context, selected models.RecentGopherItem) {
     /*
     // Save the object to the browser's persistent state
     // Persistent State acts like a global "Store" within the browser session.

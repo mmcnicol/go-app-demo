@@ -37,21 +37,27 @@ func (d *DischargeForm) OnNav(ctx app.Context) {
 */
 
 func (d *DischargeForm) OnNav(ctx app.Context) {
-    // Retrieve the object from state
+    
+	/*
+	// Retrieve the object from state
     ctx.GetState("current-patient", &d.patient)
-    d.Update()
+    ctx.Update()
+	*/
 }
 
+/*
 func (d *DischargeForm) loadPatientData(id string) {
-    // Simulation: would normally be a database lookup
+    
+	// Simulation: would normally be a database lookup
     if id == "MRN-8829" {
         d.dischargeForm = models.DischargeForm{
 			ID:   "MRN-8829",
 			Name: "John Doe",
 		}
     }
-    d.Update()
+    ctx.Update()
 }
+*/
 
 func (d *DischargeForm) Render() app.UI {
 	return app.Div().Class("container").Body(

@@ -99,14 +99,14 @@ menu := []NavItem{
 
 type LeftNavigation struct {
 	app.Compo
-	Items         []NavItem
+	Items         []models.NavItem
 	ActiveItemID  string // Tracks the currently selected page
 	ExpandedSecID string // Tracks the currently open accordion section
 }
 
-func NewLeftNavigation(Items []NavItem, ActiveItemID string, ExpandedSecID string) *LeftNavigation {
+func NewLeftNavigation(Items []models.NavItem, ActiveItemID string, ExpandedSecID string) *LeftNavigation {
     return &LeftNavigation{
-		Items: []NavItem,
+		Items: []models.NavItem,
 		ActiveItemID: string,
 		ExpandedSecID: string,
 	}
@@ -131,7 +131,7 @@ func (n *LeftNavigation) OnNav(ctx app.Context) {
     // Automatically highlight the item that matches the current URL
     currPath := ctx.Page().URL().Path
     n.ActiveItemID = currPath
-    n.Update()
+    ctx.Update()
 }
 
 func (n *LeftNavigation) Render() app.UI {
@@ -145,7 +145,7 @@ func (n *LeftNavigation) Render() app.UI {
 }
 
 // renderItem creates the UI for an individual item or a section
-func (n *LeftNavigation) renderItem(item NavItem, isChild bool) app.UI {
+func (n *LeftNavigation) renderItem(item models.NavItem, isChild bool) app.UI {
 	hasChildren := len(item.Children) > 0
 	isExpanded := n.ExpandedSecID == item.ID
 	isSelected := n.ActiveItemID == item.ID
@@ -185,7 +185,7 @@ func (n *LeftNavigation) renderItem(item NavItem, isChild bool) app.UI {
 	)
 }
 
-func (n *LeftNavigation) handleItemClick(ctx app.Context, item NavItem) {
+func (n *LeftNavigation) handleItemClick(ctx app.Context, item models.NavItem) {
 	// 1. If it's a section (has children), toggle accordion
 	if len(item.Children) > 0 {
 		if n.ExpandedSecID == item.ID {

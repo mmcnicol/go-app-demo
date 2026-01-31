@@ -1,18 +1,21 @@
 package components
 
-import "github.com/maxence-charriere/go-app/v10/pkg/app"
+import (
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
+    "go-app-demo/internal/models"
+)
 
 // Usage:
 // &LabResults{ labResults: data }
 type LabResults struct {
 	app.Compo
-	labResults  []LabResultItem
+	labResults  []models.LabResultItem
 	SortBy      string
     SortOrder   string // "asc" or "desc"
     Loading     bool
 }
 
-func NewLabResults(labResults []LabResultItem) *LabResults {
+func NewLabResults(labResults []models.LabResultItem) *LabResults {
     return &LabResults{
         labResults: labResults,
     }
@@ -77,7 +80,7 @@ func (l *LabResults) handleSort(ctx app.Context, field string) {
         l.SortOrder = "asc"
     }
     l.sortData(ctx)
-    l.Update() // Trigger re-render
+    ctx.Update() // Trigger re-render
 }
 
 func (l *LabResults) sortData() {
@@ -112,12 +115,12 @@ func (l *LabResults) sortData() {
 
 func (l *LabResults) OnMount(ctx app.Context) {
     l.Loading = true
-    l.Update()
+    ctx.Update()
 
     l.SortBy = "ReportDate"
     l.SortOrder = "desc"
     l.sortData()
     
     l.Loading = false
-    l.Update()
+    ctx.Update()
 }
