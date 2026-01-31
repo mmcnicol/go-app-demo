@@ -254,7 +254,7 @@ func (n *LeftNavigation) findAndSetActiveItem(path string, items []models.NavIte
 }
 
 // SetItems allows updating navigation items dynamically
-func (n *LeftNavigation) SetItems(ctx app.Context, items []models.NavItem) {
+func (n *LeftNavigation) SetItems(items []models.NavItem) {
 	app.Log("[LeftNavigation SetItems] Called with", len(items), "items")
 	n.Items = items
 	

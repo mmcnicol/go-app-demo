@@ -70,7 +70,7 @@ func (b *BasePage) Render() app.UI {
 			} else {
 				app.Log("[BasePage Render] Reusing non-gopher navigation")
 				// Update items if needed
-				b.leftNavigation.SetItems(nil, b.navItemsNonGopherContext)
+				b.leftNavigation.SetItems(b.navItemsNonGopherContext)
 			}
 			
 		} else {
@@ -99,7 +99,7 @@ func (b *BasePage) Render() app.UI {
 			} else {
 				app.Log("[BasePage Render] Reusing gopher navigation")
 				// Update items if needed
-				b.leftNavigation.SetItems(nil, b.navItemsGopherContext)
+				b.leftNavigation.SetItems(b.navItemsGopherContext)
 			}
 		}
 		
