@@ -184,7 +184,7 @@ var mockNavItemsNonGopherContext = []models.NavItem{
         Label: "Gopher Lists",
         Icon:  "fas fa-user-injured",
         IsDefaultExpanded: true, // This section starts open
-        Children: []NavItem{
+        Children: []models.NavItem{
             {ID: "RecentGophers", Label: "Recent Gophers", Icon: "fas fa-list", IsLoading: true },
             {ID: "PharmacyDischargeList", Label: "Pharmacy Discharge List", Icon: "fas fa-plus-circle", IsLoading: true },
         },
@@ -209,7 +209,7 @@ var mockNavItemsGopherContext = []models.NavItem{
         Label: "Gopher Lists",
         Icon:  "fas fa-user-injured",
         IsDefaultExpanded: false,
-        Children: []NavItem{
+        Children: []models.NavItem{
             {ID: "RecentGophers", Label: "Recent Gophers", Icon: "fas fa-list", IsLoading: true },
             {ID: "PharmacyDischargeList", Label: "Pharmacy Discharge List", Icon: "fas fa-plus-circle", IsLoading: true },
         },
@@ -224,7 +224,7 @@ var mockNavItemsGopherContext = []models.NavItem{
         Label: "Gopher Records",
         Icon:  "fas fa-user-injured",
         IsDefaultExpanded: true,
-        Children: []NavItem{
+        Children: []models.NavItem{
             {ID: "LabResults", Label: "Lab Results", Icon: "fas fa-list", IsLoading: true },
         },
     },

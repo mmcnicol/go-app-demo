@@ -55,7 +55,7 @@ func (b *BasePage) Render() app.UI {
     var content app.UI
 
 	if b.user == nil {
-		return &PageLayout{
+		return &models.PageLayout{
 			applicationBanner: NewApplicationBanner("Gopher Portal"),
 			leftNavigation:    nil,
 			gopherBanner:      nil,
