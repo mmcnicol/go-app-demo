@@ -104,7 +104,7 @@ type LeftNavigation struct {
 	ExpandedSecID string // Tracks the currently open accordion section
 }
 
-func NewLeftNavigation(Items []NavItem, ActiveItemID string, ExpandedSecID: string) *LeftNavigation {
+func NewLeftNavigation(Items []NavItem, ActiveItemID string, ExpandedSecID string) *LeftNavigation {
     return &LeftNavigation{
 		Items: []NavItem,
 		ActiveItemID: string,
