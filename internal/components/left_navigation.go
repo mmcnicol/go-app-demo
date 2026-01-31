@@ -104,12 +104,12 @@ type LeftNavigation struct {
 	ExpandedSecID string // Tracks the currently open accordion section
 }
 
-func NewLeftNavigation(Items []models.NavItem, ActiveItemID string, ExpandedSecID string) *LeftNavigation {
+func NewLeftNavigation(items []models.NavItem, activeItemID string, expandedSecID string) *LeftNavigation {
     return &LeftNavigation{
-		Items: []models.NavItem,
-		ActiveItemID: string,
-		ExpandedSecID: string,
-	}
+        Items:         items,
+        ActiveItemID:  activeItemID,
+        ExpandedSecID: expandedSecID,
+    }
 }
 
 // OnMount handles the "Default Expanded" requirement
@@ -122,6 +122,25 @@ func (n *LeftNavigation) OnMount(ctx app.Context) {
 	}
 }
 
+// Helper method to recursively find and set active item
+func (n *LeftNavigation) findAndSetActiveItem(path string, items []models.NavItem) bool {
+    for _, item := range items {
+        if item.ID == path || item.Route == path { // Check both ID and Route if exists
+            n.ActiveItemID = item.ID
+            return true
+        }
+        // Check children recursively
+        if len(item.Children) > 0 {
+            if n.findAndSetActiveItem(path, item.Children) {
+                // Also expand parent if child is active
+                n.ExpandedSecID = item.ID
+                return true
+            }
+        }
+    }
+    return false
+}
+
 /* 
 To ensure the sidebar knows which item is active when a user 
 refreshes the page or uses the back button, use app.Window().URL() 
@@ -130,7 +149,15 @@ inside the OnMount or OnNav lifecycle events.
 func (n *LeftNavigation) OnNav(ctx app.Context) {
     // Automatically highlight the item that matches the current URL
     currPath := ctx.Page().URL().Path
-    n.ActiveItemID = currPath
+    
+	/*
+	n.ActiveItemID = currPath
+    ctx.Update()
+	*/
+
+	// Find matching item in the navigation tree
+    n.findAndSetActiveItem(currPath, n.Items)
+    
     ctx.Update()
 }
 
@@ -155,6 +182,7 @@ func (n *LeftNavigation) renderItem(item models.NavItem, isChild bool) app.UI {
 			Class("nav-item").
 			// Apply conditional classes for selection and children
 			Class(app.If(isSelected, "selected").Else("")).
+			Class(app.If(hasChildren, "has-children").Else("")).
 			OnClick(func(ctx app.Context, e app.Event) {
 				n.handleItemClick(ctx, item)
 			}).
@@ -167,7 +195,8 @@ func (n *LeftNavigation) renderItem(item models.NavItem, isChild bool) app.UI {
 						app.I().Class(item.Icon),
 					),
 				),
-				app.Text(item.Label),
+				//app.Text(item.Label),
+				app.Span().Class("nav-label").Text(item.Label),
 				// Chevron indicator for sections
 				app.If(hasChildren,
 					app.I().Class("fas ml-auto").
@@ -204,10 +233,13 @@ func (n *LeftNavigation) handleItemClick(ctx app.Context, item models.NavItem) {
 		// item.IsLoading = true
 		// n.startEagerLoading(ctx, item.ID)
 
+		/*
 		// Routing Logic:
         // Assume NavItem.ID matches our route (e.g., "/patients")
-        ctx.Navigate(item.ID) 
+        ctx.Navigate(item.ID)
+		*/ 
     }
+	ctx.Update() // Trigger re-render
 }
 
 /*
