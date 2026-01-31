@@ -3,6 +3,7 @@ package components
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"go-app-demo/internal/models"
+    "time"
 )
 
 // LoginHandler defines the signature for login callback functions
@@ -63,12 +64,12 @@ func (l *LoginForm) Render() app.UI {
 
 func (l *LoginForm) onUsernameChange(ctx app.Context, e app.Event) {
 	l.Username = ctx.JSSrc().Get("value").String()
-	l.Update()
+	ctx.Update()
 }
 
 func (l *LoginForm) onPasswordChange(ctx app.Context, e app.Event) {
 	l.Password = ctx.JSSrc().Get("value").String()
-	l.Update()
+	ctx.Update()
 }
 
 func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
@@ -101,16 +102,16 @@ func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
 
 func (l *LoginForm) performLogin(ctx app.Context) {
 	defer func() {
-		l.Defer(func() {
+		ctx.Defer(func() {
 			l.IsLoading = false
 			ctx.Update()
 		})
 	}()
 	
 	// Call the provided login handler
-	user, err := l.OnLogin(ctx, l.Username, l.Password)
+	_, err := l.OnLogin(ctx, l.Username, l.Password)
 	if err != nil {
-		l.Defer(func() {
+		ctx.Defer(func() {
 			l.Error = err.Error()
 			ctx.Update()
 		})
@@ -119,7 +120,7 @@ func (l *LoginForm) performLogin(ctx app.Context) {
 	
 	// Success - you could trigger a navigation or state update here
 	// Typically the parent component would handle what happens after successful login
-	l.Defer(func() {
+	ctx.Defer(func() {
 		l.Error = "Login successful! Redirecting..."
 		// Clear form
 		l.Username = ""
@@ -139,7 +140,7 @@ func (l *LoginForm) performLogin(ctx app.Context) {
 
 func (l *LoginForm) mockLogin(ctx app.Context) {
 	// Simulate network delay
-	app.Dispatch(func() {
+	ctx.Dispatch(func() {
 		l.IsLoading = true
 		ctx.Update()
 	})
@@ -147,7 +148,7 @@ func (l *LoginForm) mockLogin(ctx app.Context) {
 	// Simulate API call
 	time.Sleep(1 * time.Second)
 	
-	l.Defer(func() {
+	ctx.Defer(func() {
 		l.IsLoading = false
 		
 		// Simple mock validation
