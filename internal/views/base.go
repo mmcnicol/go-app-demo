@@ -24,6 +24,16 @@ type BasePage struct {
 func (b *BasePage) Render() app.UI {
     var content app.UI
 
+	// temp hack
+	user := &models.User{
+		Username: username,
+		Forename: "Demo",
+		Surname:  "User",
+	}
+	
+	// Set the user on BasePage
+	b.user = user
+	
 	// Check if user is nil (using pointer)
 	if b.user == nil {
 		// Create login form with callback to BasePage's login method
