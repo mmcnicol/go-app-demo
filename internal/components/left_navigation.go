@@ -145,7 +145,7 @@ func (n *LeftNavigation) renderItem(item models.NavItem, isChild bool) app.UI {
 			OnClick(func(ctx app.Context, e app.Event) {
 				app.Log("[LeftNavigation handleItemClick] Clicked on item:", item.ID, "Label:", item.Label)
 				e.PreventDefault() // Prevent default behavior
-				e.StopPropagation() // Stop event bubbling
+				//e.StopPropagation() // Stop event bubbling
 				n.handleItemClick(ctx, item)
 			}).
 			Body(
