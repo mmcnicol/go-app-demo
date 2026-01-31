@@ -57,7 +57,7 @@ func (b *BasePage) Render() app.UI {
 			}
 			b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
 			b.activeID = "RecentGophers"
-			b.expandedSecID = "GophersLists"
+			b.expandedSecID = "GopherLists"
 			
 			app.Log("[BasePage Render] Non-gopher context, gopherDemographics is nil")
 			app.Log("[BasePage Render] Navigation items:", len(b.navItemsNonGopherContext))
@@ -88,7 +88,7 @@ func (b *BasePage) Render() app.UI {
 			//b.gopherDemographics = b.fetchGophersDemographics()
 			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 			b.activeID = "LabResults"
-			b.expandedSecID = "GophersRecords"
+			b.expandedSecID = "GopherRecords"
 			
 			app.Log("[BasePage Render] Gopher context, gopherDemographics exists")
 			app.Log("[BasePage Render] Navigation items (gopher context):", len(b.navItemsGopherContext))
@@ -328,7 +328,7 @@ func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
 			Route:     "/settings",
 		},
 		{
-			ID:                "GophersLists",
+			ID:                "GopherLists",
 			Label:             "Gopher Lists",
 			Icon:              "fas fa-user-injured",
 			IsDefaultExpanded: true,
@@ -371,7 +371,7 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 			Route:     "/settings",
 		},
 		{
-			ID:                "GophersLists",
+			ID:                "GopherLists",
 			Label:             "Gopher Lists",
 			Icon:              "fas fa-user-injured",
 			IsDefaultExpanded: false,
@@ -401,7 +401,7 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 			Route:     "/search",
 		},
 		{
-			ID:                "GophersRecords",
+			ID:                "GopherRecords",
 			Label:             "Gopher Records",
 			Icon:              "fas fa-user-injured",
 			IsDefaultExpanded: true,
