@@ -87,7 +87,7 @@ func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
 	e.PreventDefault()
     
 	// Validate inputs
-    err := l.validate(ctx)
+    err := l.validate()
     if err != nil {
         l.Error = err.Error()
         ctx.Update()
@@ -159,7 +159,7 @@ func (l *LoginForm) performLogin(ctx app.Context) {
 
 func (l *LoginForm) mockLogin(ctx app.Context) {
 	// Simulate network delay
-	ctx.Dispatch(func() {
+	l.Dispatch(func(ctx app.Context) {
 		l.IsLoading = true
 		ctx.Update()
 	})
@@ -167,7 +167,7 @@ func (l *LoginForm) mockLogin(ctx app.Context) {
 	// Simulate API call
 	time.Sleep(1 * time.Second)
 	
-	ctx.Defer(func() {
+	l.Defer(func(ctx app.Context) {
 		l.IsLoading = false
 		
 		// Simple mock validation
