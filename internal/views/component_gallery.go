@@ -77,11 +77,11 @@ func (g *ComponentGallery) Render() app.UI {
                 },
             ).ElseIf(g.selectedComponent == "ApplicationBanner",
                 func() app.UI {
-                    return NewApplicationBanner()
+                    return NewApplicationBanner("Application Banner")
                 },
             ).ElseIf(g.selectedComponent == "PageFooter",
                 func() app.UI {
-                    return NewPageFooter()
+                    return NewPageFooter("Page Footer")
                 },
             ).ElseIf(g.selectedComponent == "LoginForm",
                 func() app.UI {
@@ -127,8 +127,7 @@ var mockUsers = []models.User{
 }
 
 // Define mock RecentGophers
-var mockRecentGophers = []models.RecentGopherItem {
-	return []models.RecentGopherItem{
+var mockRecentGophers = []models.RecentGopherItem{
 		{
 			GopherId:         "gopher-001",
 			Name:             "Alice",
@@ -151,8 +150,7 @@ var mockRecentGophers = []models.RecentGopherItem {
 }
 
 // Define mock LabResults
-var mockLabResults = []models.LabResultItem {
-	return []models.LabResultItem{
+var mockLabResults = []models.LabResultItem{
 		{
 			ID:         "rpt-001",
 			Subject:             "Blood",
@@ -175,8 +173,7 @@ var mockLabResults = []models.LabResultItem {
 }
 
 // Define mock NavItems (NonGopherContext)
-var mockNavItemsNonGopherContext = []models.NavItem {
-	return []models.NavItem{
+var mockNavItemsNonGopherContext = []models.NavItem{
 		{
 			ID:    "MySettings",
 			Label: "My Settings",
@@ -203,8 +200,7 @@ var mockNavItemsNonGopherContext = []models.NavItem {
 
 
 // Define mock NavItems (GopherContext)
-var mockNavItemsGopherContext = []models.NavItem {
-	return []NavItem{
+var mockNavItemsGopherContext = []models.[]NavItem{
 		{
 			ID:    "MySettings",
 			Label: "My Settings",
