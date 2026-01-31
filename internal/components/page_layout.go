@@ -39,22 +39,22 @@ func NewPageLayoutWithComponents(appBanner *ApplicationBanner, nav *LeftNavigati
 func (p *PageLayout) Render() app.UI {
     return app.Div().Class("app-container").Body(
         // Use pointer to applicationBanner (which implements app.UI)
-        p.applicationBanner,
+        p.ApplicationBanner,
         app.Div().Class("app-body").Body(
             // Include left navigation if it exists
-            app.If(p.leftNavigation != nil,
+            app.If(p.LeftNavigation != nil,
                 func() app.UI {
-                    return p.leftNavigation
+                    return p.LeftNavigation
                 },
             ),
             app.Div().Class("main-content").Body(
                 // Use pointer to gopherBanner
-                p.gopherBanner,
+                p.GopherBanner,
                 app.Div().Class("content-area").Body(
                     p.Body,
                 ),
                 // Use pointer to pageFooter
-                p.pageFooter,
+                p.PageFooter,
             ),
         ),
     )
@@ -67,21 +67,21 @@ func (p *PageLayout) SetBody(ctx app.Context, body app.UI) {
 }
 
 func (p *PageLayout) SetLeftNavigation(ctx app.Context, nav *LeftNavigation) {
-    p.leftNavigation = nav
+    p.LeftNavigation = nav
     ctx.Update()
 }
 
 func (p *PageLayout) SetApplicationBanner(ctx app.Context, banner *ApplicationBanner) {
-    p.applicationBanner = banner
+    p.ApplicationBanner = banner
     ctx.Update()
 }
 
 func (p *PageLayout) SetGopherBanner(ctx app.Context, banner *GopherBanner) {
-    p.gopherBanner = banner
+    p.GopherBanner = banner
     ctx.Update()
 }
 
 func (p *PageLayout) SetPageFooter(ctx app.Context, footer *PageFooter) {
-    p.pageFooter = footer
+    p.PageFooter = footer
     ctx.Update()
 }

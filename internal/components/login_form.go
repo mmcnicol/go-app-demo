@@ -55,8 +55,8 @@ func (l *LoginForm) onPasswordChange(ctx app.Context, e app.Event) {
 
 func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
     e.PreventDefault()
-    app.Log("Form submitted:", l.UserLoginForm.Username)
-    app.Log("Form submitted:", l.UserLoginForm.Password)
+    app.Log("Form submitted:", l.Username)
+    app.Log("Form submitted:", l.Password)
 
     // You would call the parent page's login method here
     // For now, just show a message
