@@ -76,9 +76,21 @@ func (g *ComponentGallery) Render() app.UI {
 				func() app.UI {
 					return components.NewPageFooter("© 2024 Component Gallery")
 				},
+			// component_gallery.go - update the LoginForm section
 			).ElseIf(g.selectedComponent == "LoginForm",
 				func() app.UI {
-					return components.NewLoginForm()
+					// Create a mock login handler for the gallery
+					mockHandler := func(username, password string) (*models.User, error) {
+						if username == "demo" && password == "demo" {
+							return &models.User{
+								Username: username,
+								Forename: "Gallery",
+								Surname:  "User",
+							}, nil
+						}
+						return nil, fmt.Errorf("Try: demo/demo")
+					}
+					return components.NewLoginForm(mockHandler)
 				},
 			).ElseIf(g.selectedComponent == "RecentGophers",
 				func() app.UI {
