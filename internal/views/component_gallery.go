@@ -1,5 +1,4 @@
-// component_gallery.go
-package pages
+package views
 
 import (
 	"time"

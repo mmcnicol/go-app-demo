@@ -1,5 +1,4 @@
-// base.go
-package pages
+package views
 
 import (
 	"time"

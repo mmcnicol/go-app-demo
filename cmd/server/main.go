@@ -21,7 +21,7 @@ func main() {
 	//app.Route("/discharge/{id}", func() app.Composer { return &pages.DischargeForm{} })
 
 	app.Route("/", func() app.Composer { return &views.BasePage{} })
-	app.Route("/dev/components", func() app.Composer { return &view.ComponentGallery{} })
+	app.Route("/dev/components", func() app.Composer { return &views.ComponentGallery{} })
 	
 	h := &app.Handler{
 		Name:      "Clinical Portal",
