@@ -109,6 +109,7 @@ func (a *Autocomplete) OnInput(ctx app.Context, e app.Event) {
 		a.results = nil
 		a.showPicker = false
 		a.isLoading = false
+		ctx.Update()
 		return
 	}
 
@@ -118,6 +119,8 @@ func (a *Autocomplete) OnInput(ctx app.Context, e app.Event) {
 	}
 
 	a.isLoading = true
+	ctx.Update()
+	
 	a.debounce = time.AfterFunc(a.Delay, func() {
 		if a.UseMockData || a.Endpoint == "" {
 			a.fetchMockResults(ctx)
@@ -137,6 +140,7 @@ func (a *Autocomplete) fetchAPIResults(ctx app.Context) {
 			ctx.Dispatch(func(ctx app.Context) {
 				a.errorMsg = fmt.Sprintf("Error fetching results: %v", err)
 				a.isLoading = false
+				ctx.Update()
 			})
 			return
 		}
@@ -148,6 +152,7 @@ func (a *Autocomplete) fetchAPIResults(ctx app.Context) {
 			ctx.Dispatch(func(ctx app.Context) {
 				a.errorMsg = fmt.Sprintf("Error reading response: %v", err)
 				a.isLoading = false
+				ctx.Update()
 			})
 			return
 		}
@@ -165,6 +170,7 @@ func (a *Autocomplete) fetchAPIResults(ctx app.Context) {
 				}
 				a.showPicker = len(a.results) > 0
 				a.isLoading = false
+				ctx.Update()
 			})
 			return
 		}
@@ -182,6 +188,7 @@ func (a *Autocomplete) fetchAPIResults(ctx app.Context) {
 				ctx.Dispatch(func(ctx app.Context) {
 					a.showPicker = len(a.options) > 0
 					a.isLoading = false
+					ctx.Update()
 				})
 				return
 			}
@@ -194,6 +201,7 @@ func (a *Autocomplete) fetchAPIResults(ctx app.Context) {
 				a.options = stringArray
 				a.showPicker = len(a.options) > 0
 				a.isLoading = false
+				ctx.Update()
 			})
 			return
 		}
@@ -201,6 +209,7 @@ func (a *Autocomplete) fetchAPIResults(ctx app.Context) {
 		ctx.Dispatch(func(ctx app.Context) {
 			a.errorMsg = "Invalid response format from server"
 			a.isLoading = false
+			ctx.Update()
 		})
 	})
 }
@@ -252,6 +261,7 @@ func (a *Autocomplete) fetchMockResults(ctx app.Context) {
 		a.results = results
 		a.showPicker = len(a.options) > 0
 		a.isLoading = false
+		ctx.Update()
 	})
 }
 
@@ -269,15 +279,15 @@ func (a *Autocomplete) onSelect(ctx app.Context, index int) {
 	if index < len(a.results) {
 		a.selectedID = a.results[index].ID
 		
-		// Dispatch event to parent (using NewAction in v10)
-		ctx.NewAction("autocomplete-select", map[string]interface{}{
-			"id":    a.results[index].ID,
-			"label": a.results[index].Label,
-			"value": a.results[index].Value,
+		// In go-app v10, we can use Dispatch to send an action
+		ctx.Dispatch(func(ctx app.Context) {
+			// You can handle the selection here or in parent component
+			// For example, trigger navigation or update state
+			app.Logf("Autocomplete selected: %s (ID: %s)", a.results[index].Label, a.results[index].ID)
 		})
 	}
 	
-	a.Update()
+	ctx.Update()
 }
 
 func (a *Autocomplete) Render() app.UI {
@@ -355,7 +365,9 @@ func (a *Autocomplete) renderOption(text string) app.UI {
 // SetQuery allows programmatically setting the query
 func (a *Autocomplete) SetQuery(query string) {
 	a.query = query
-	a.Update()
+	a.Defer(func(ctx app.Context) {
+		ctx.Update()
+	})
 }
 
 // Clear clears the query and results
@@ -367,7 +379,9 @@ func (a *Autocomplete) Clear() {
 	a.isLoading = false
 	a.errorMsg = ""
 	a.selectedID = ""
-	a.Update()
+	a.Defer(func(ctx app.Context) {
+		ctx.Update()
+	})
 }
 
 // GetQuery returns the current query
