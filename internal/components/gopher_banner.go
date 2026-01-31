@@ -20,13 +20,13 @@ func NewGopherBanner(demographics *models.GopherDemographics) *GopherBanner {
 
 func (gb *GopherBanner) Render() app.UI {
 
-	if g.GopherDemographics == nil {
+	if gb.GopherDemographics == nil {
 		return app.Div().Class("demographics-bar").Body(
 			app.Span().Text("No Gopher Selected"),
 		)
 	}
 
-	dobFormatted := gb.gopherDemographics.DateOfBirth.Format("02/01/2006")
+	dobFormatted := gb.GopherDemographics.DateOfBirth.Format("02/01/2006")
 	age := int(time.Since(gb.GopherDemographics.DateOfBirth).Hours() / 24 / 365)
 
 	return app.Div().Class("demographics-bar").Body(

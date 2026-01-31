@@ -18,7 +18,7 @@ func NewPageLayout(body app.UI) *PageLayout {
     return &PageLayout{
         ApplicationBanner: NewApplicationBanner("Application Banner"),
         LeftNavigation:    NewLeftNavigation([]models.NavItem{}, "", ""),
-        GopherBanner:      NewGopherBanner(models.GopherDemographics{}),
+        GopherBanner:      NewGopherBanner(&models.GopherDemographics{}),
         Body:              body,
         PageFooter:        NewPageFooter("Page Footer"),
     }
