@@ -9,16 +9,22 @@ import (
 
 type GopherBanner struct {
 	app.Compo
-	gopherDemographics models.GopherDemographics
+	GopherDemographics *models.GopherDemographics
 }
 
-func NewGopherBanner(gopherDemographics models.GopherDemographics) *GopherBanner {
-    return &GopherBanner{
-        gopherDemographics: gopherDemographics,
-    }
+func NewGopherBanner(demographics *models.GopherDemographics) *GopherBanner {
+	return &GopherBanner{
+		GopherDemographics: demographics,
+	}
 }
 
 func (gb *GopherBanner) Render() app.UI {
+
+	if g.GopherDemographics == nil {
+		return app.Div().Class("demographics-bar").Body(
+			app.Span().Text("No Gopher Selected"),
+		)
+	}
 
 	dobFormatted := gb.gopherDemographics.DateOfBirth.Format("02/01/2006")
 	age := int(time.Since(gb.gopherDemographics.DateOfBirth).Hours() / 24 / 365)
