@@ -261,9 +261,11 @@ func (n *LeftNavigation) SetItems(ctx app.Context, items []models.NavItem) {
 	// Re-initialize state based on new items
 	n.initializeState()
 	
+	/*
 	ctx.Async(func() {
 		ctx.Update()
 	})
+	*/
 }
 
 // SetActiveItem allows programmatically setting active item
