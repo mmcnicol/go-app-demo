@@ -1,6 +1,7 @@
 package components
 
 import (
+    "fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"go-app-demo/internal/models"
     "time"
@@ -86,7 +87,7 @@ func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
 	e.PreventDefault()
     
 	// Validate inputs
-    err := validate(ctx)
+    err := l.validate(ctx)
     if err != nil {
         l.Error = err.Error()
         ctx.Update()
@@ -120,7 +121,7 @@ func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
 
 func (l *LoginForm) performLogin(ctx app.Context) {
 	defer func() {
-		ctx.Defer(func() {
+		l.Defer(func(ctx app.Context) {
 			l.IsLoading = false
 			ctx.Update()
 		})
@@ -129,7 +130,7 @@ func (l *LoginForm) performLogin(ctx app.Context) {
 	// Call the provided login handler
 	_, err := l.OnLogin(ctx, l.Username, l.Password)
 	if err != nil {
-		ctx.Defer(func() {
+		l.Defer(func(ctx app.Context) {
 			l.Error = err.Error()
 			ctx.Update()
 		})
@@ -138,7 +139,7 @@ func (l *LoginForm) performLogin(ctx app.Context) {
 	
 	// Success - you could trigger a navigation or state update here
 	// Typically the parent component would handle what happens after successful login
-	ctx.Defer(func() {
+	l.Defer(func(ctx app.Context) {
 		l.Error = "Login successful! Redirecting..."
 		// Clear form
 		l.Username = ""
