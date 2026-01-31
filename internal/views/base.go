@@ -18,7 +18,7 @@ type BasePage struct {
 	gopherDemographics       *models.GopherDemographics
 	recentGophers            []models.RecentGopherItem
 	labResults               []models.LabResultItem
-	leftNavigation           *components.LeftNavigation // Single instance
+	// Remove: leftNavigation *components.LeftNavigation
 }
 
 func (b *BasePage) Render() app.UI {
@@ -61,14 +61,8 @@ func (b *BasePage) Render() app.UI {
 			app.Log("[BasePage Render] Non-gopher context, gopherDemographics is nil")
 			app.Log("[BasePage Render] Navigation items:", len(b.navItemsNonGopherContext))
 			
-			// Create or update left navigation
-			if b.leftNavigation == nil {
-				app.Log("[BasePage Render] Creating new LeftNavigation for non-gopher context")
-				b.leftNavigation = components.NewLeftNavigation(b.navItemsNonGopherContext)
-			} else {
-				app.Log("[BasePage Render] Updating existing LeftNavigation for non-gopher context")
-				b.leftNavigation.SetItems(b.Context(), b.navItemsNonGopherContext)
-			}
+			// Note: In Render(), we don't have access to ctx, so we can't update components here
+			// We'll update the navigation in OnMount and event handlers instead
 			
 			return &components.PageLayout{
 				ApplicationBanner: components.NewApplicationBanner(
@@ -76,7 +70,7 @@ func (b *BasePage) Render() app.UI {
 					b.handleQuickSearch, // Quick search handler
 					b.handleLogout,      // Logout handler
 				),
-				LeftNavigation:    b.leftNavigation, // Use the same instance
+				LeftNavigation:    components.NewLeftNavigation(b.navItemsNonGopherContext),
 				GopherBanner:      nil,
 				Body:              content,
 				PageFooter:        components.NewPageFooter("© 2024 Clinical Portal. All rights reserved."),
@@ -100,24 +94,13 @@ func (b *BasePage) Render() app.UI {
 			app.Log("[BasePage Render] Navigation items (gopher context):", len(b.navItemsGopherContext))
 			app.Log("[BasePage Render] Active ID:", b.activeID)
 			
-			// Create or update left navigation
-			if b.leftNavigation == nil {
-				app.Log("[BasePage Render] Creating new LeftNavigation for gopher context")
-				b.leftNavigation = components.NewLeftNavigation(b.navItemsGopherContext)
-			} else {
-				app.Log("[BasePage Render] Updating existing LeftNavigation for gopher context")
-				b.leftNavigation.SetItems(b.Context(), b.navItemsGopherContext)
-				// Optionally set LabResults as active
-				b.leftNavigation.SetActiveItem(b.Context(), "LabResults")
-			}
-			
 			return &components.PageLayout{
 				ApplicationBanner: components.NewApplicationBanner(
 					"Gopher Portal",
 					b.handleQuickSearch, // Quick search handler
 					b.handleLogout,      // Logout handler
 				),
-				LeftNavigation:    b.leftNavigation, // Use the same instance
+				LeftNavigation:    components.NewLeftNavigation(b.navItemsGopherContext),
 				GopherBanner:      components.NewGopherBanner(b.gopherDemographics),
 				Body:              content,
 				PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
@@ -201,12 +184,6 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 			app.Log("[BasePage handleQuickSearch dispatch] New gopherDemographics:", b.gopherDemographics)
 			app.Log("[BasePage handleQuickSearch dispatch] New activeID:", b.activeID)
 			app.Log("[BasePage handleQuickSearch dispatch] Navigation items updated to gopher context")
-			
-			// Update left navigation if it exists
-			if b.leftNavigation != nil {
-				b.leftNavigation.SetItems(ctx, b.navItemsGopherContext)
-				b.leftNavigation.SetActiveItem(ctx, "LabResults")
-			}
 		})
 		
 		app.Log("[BasePage] Found patient:", patientID)
@@ -226,7 +203,6 @@ func (b *BasePage) handleLogout(ctx app.Context) {
 	b.gopherDemographics = nil
 	b.recentGophers = nil
 	b.labResults = nil
-	b.leftNavigation = nil // Reset navigation instance
 	
 	// Trigger re-render
 	ctx.Update()
@@ -259,7 +235,6 @@ func (b *BasePage) OnNav(ctx app.Context) {
 	// We could check for existing session/cookie here
 	// For demo purposes, we'll start with no user logged in
 	b.user = nil
-	b.leftNavigation = nil // Reset navigation instance
     ctx.Update()
 }
 
