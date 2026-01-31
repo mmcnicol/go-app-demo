@@ -108,7 +108,7 @@ func (l *LoginForm) performLogin(ctx app.Context) {
 	}()
 	
 	// Call the provided login handler
-	user, err := l.OnLogin(ctx app.Context, l.Username, l.Password)
+	user, err := l.OnLogin(ctx, l.Username, l.Password)
 	if err != nil {
 		l.Defer(func() {
 			l.Error = err.Error()
