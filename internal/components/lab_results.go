@@ -48,8 +48,7 @@ func (l *LabResults) Render() app.UI {
 					return app.Tr().Body(
 						app.Td().ColSpan(3).Text("Loading..."),
 					)
-				}),
-                app.If(len(l.LabResults)==0, func() app.UI {
+				}).ElseIf(len(l.LabResults)==0, func() app.UI {
 					return app.Tr().Body(
 						app.Td().ColSpan(3).Text("No Results Found."),
 					)

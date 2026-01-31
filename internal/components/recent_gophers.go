@@ -49,8 +49,7 @@ func (r *RecentGophers) Render() app.UI {
                 return app.Tr().Body(
                     app.Td().ColSpan(3).Text("Loading..."),
                 )
-            }),
-            app.If(len(r.recentGophers)==0, func() app.UI {
+            }).ElseIf(len(r.recentGophers)==0, func() app.UI {
                 return app.Tr().Body(
                     app.Td().ColSpan(3).Text("No Results Found."),
                 )
