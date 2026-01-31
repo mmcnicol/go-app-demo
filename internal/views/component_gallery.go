@@ -128,108 +128,103 @@ var mockUsers = []models.User{
 
 // Define mock RecentGophers
 var mockRecentGophers = []models.RecentGopherItem{
-		{
-			GopherId:         "gopher-001",
-			Name:             "Alice",
-			DateOfBirth:      time.Date(1990, 1, 15, 0, 0, 0, 0, time.UTC),
-			DateLastAccessed: time.Now().Add(-24 * time.Hour),
-		},
-		{
-			GopherId:         "gopher-003",
-			Name:             "Charlie",
-			DateOfBirth:      time.Date(1985, 5, 20, 0, 0, 0, 0, time.UTC),
-			DateLastAccessed: time.Now().Add(-2 * time.Hour),
-		},
-		{
-			GopherId:         "gopher-002",
-			Name:             "Bob",
-			DateOfBirth:      time.Date(1995, 10, 5, 0, 0, 0, 0, time.UTC),
-			DateLastAccessed: time.Now().Add(-5 * time.Hour),
-		},
-	}
+    {
+        GopherId:         "gopher-001",
+        Name:             "Alice",
+        DateOfBirth:      time.Date(1990, 1, 15, 0, 0, 0, 0, time.UTC),
+        DateLastAccessed: time.Now().Add(-24 * time.Hour),
+    },
+    {
+        GopherId:         "gopher-003",
+        Name:             "Charlie",
+        DateOfBirth:      time.Date(1985, 5, 20, 0, 0, 0, 0, time.UTC),
+        DateLastAccessed: time.Now().Add(-2 * time.Hour),
+    },
+    {
+        GopherId:         "gopher-002",
+        Name:             "Bob",
+        DateOfBirth:      time.Date(1995, 10, 5, 0, 0, 0, 0, time.UTC),
+        DateLastAccessed: time.Now().Add(-5 * time.Hour),
+    },
 }
 
 // Define mock LabResults
 var mockLabResults = []models.LabResultItem{
-		{
-			ID:         "rpt-001",
-			Subject:             "Blood",
-			//ReportDate:      time.Date(2025, 1, 15, 0, 0, 0, 0, time.UTC),
-			ReportDate: time.Now().Add(-24 * time.Hour),
-		},
-		{
-			ID:         "rpt-003",
-			Subject:             "Pancreas",
-			//ReportDate:      time.Date(2024, 5, 20, 0, 0, 0, 0, time.UTC),
-			ReportDate: time.Now().Add(-2 * time.Hour),
-		},
-		{
-			ID:         "rpt-002",
-			Subject:             "Liver",
-			//ReportDate:      time.Date(2023, 10, 5, 0, 0, 0, 0, time.UTC),
-			ReportDate: time.Now().Add(-5 * time.Hour),
-		},
-	}
+    {
+        ID:         "rpt-001",
+        Subject:             "Blood",
+        //ReportDate:      time.Date(2025, 1, 15, 0, 0, 0, 0, time.UTC),
+        ReportDate: time.Now().Add(-24 * time.Hour),
+    },
+    {
+        ID:         "rpt-003",
+        Subject:             "Pancreas",
+        //ReportDate:      time.Date(2024, 5, 20, 0, 0, 0, 0, time.UTC),
+        ReportDate: time.Now().Add(-2 * time.Hour),
+    },
+    {
+        ID:         "rpt-002",
+        Subject:             "Liver",
+        //ReportDate:      time.Date(2023, 10, 5, 0, 0, 0, 0, time.UTC),
+        ReportDate: time.Now().Add(-5 * time.Hour),
+    },
 }
 
 // Define mock NavItems (NonGopherContext)
 var mockNavItemsNonGopherContext = []models.NavItem{
-		{
-			ID:    "MySettings",
-			Label: "My Settings",
-			Icon:  "fas fa-cog",
-			IsLoading: false, // Example of eager loading state
-		},
-		{
-			ID:    "GopherLists",
-			Label: "Gopher Lists",
-			Icon:  "fas fa-user-injured",
-			IsDefaultExpanded: true, // This section starts open
-			Children: []NavItem{
-				{ID: "RecentGophers", Label: "Recent Gophers", Icon: "fas fa-list", IsLoading: true },
-				{ID: "PharmacyDischargeList", Label: "Pharmacy Discharge List", Icon: "fas fa-plus-circle", IsLoading: true },
-			},
-		},
-		{
-			ID:    "GopherSearch",
-			Label: "Gopher Search",
-			Icon:  "fas fa-chart-line",
-		},
-	}
+    {
+        ID:    "MySettings",
+        Label: "My Settings",
+        Icon:  "fas fa-cog",
+        IsLoading: false, // Example of eager loading state
+    },
+    {
+        ID:    "GopherLists",
+        Label: "Gopher Lists",
+        Icon:  "fas fa-user-injured",
+        IsDefaultExpanded: true, // This section starts open
+        Children: []NavItem{
+            {ID: "RecentGophers", Label: "Recent Gophers", Icon: "fas fa-list", IsLoading: true },
+            {ID: "PharmacyDischargeList", Label: "Pharmacy Discharge List", Icon: "fas fa-plus-circle", IsLoading: true },
+        },
+    },
+    {
+        ID:    "GopherSearch",
+        Label: "Gopher Search",
+        Icon:  "fas fa-chart-line",
+    },
 }
-
 
 // Define mock NavItems (GopherContext)
 var mockNavItemsGopherContext = []models.[]NavItem{
-		{
-			ID:    "MySettings",
-			Label: "My Settings",
-			Icon:  "fas fa-cog",
-			IsLoading: false, // Example of eager loading state
-		},
-		{
-			ID:    "GopherLists",
-			Label: "Gopher Lists",
-			Icon:  "fas fa-user-injured",
-			IsDefaultExpanded: false,
-			Children: []NavItem{
-				{ID: "RecentGophers", Label: "Recent Gophers", Icon: "fas fa-list", IsLoading: true },
-				{ID: "PharmacyDischargeList", Label: "Pharmacy Discharge List", Icon: "fas fa-plus-circle", IsLoading: true },
-			},
-		},
-		{
-			ID:    "GopherSearch",
-			Label: "Gopher Search",
-			Icon:  "fas fa-chart-line",
-		},
-		{
-			ID:    "GopherRecords",
-			Label: "Gopher Records",
-			Icon:  "fas fa-user-injured",
-			IsDefaultExpanded: true,
-			Children: []NavItem{
-				{ID: "LabResults", Label: "Lab Results", Icon: "fas fa-list", IsLoading: true },
-			},
-		},
-	}
+    {
+        ID:    "MySettings",
+        Label: "My Settings",
+        Icon:  "fas fa-cog",
+        IsLoading: false, // Example of eager loading state
+    },
+    {
+        ID:    "GopherLists",
+        Label: "Gopher Lists",
+        Icon:  "fas fa-user-injured",
+        IsDefaultExpanded: false,
+        Children: []NavItem{
+            {ID: "RecentGophers", Label: "Recent Gophers", Icon: "fas fa-list", IsLoading: true },
+            {ID: "PharmacyDischargeList", Label: "Pharmacy Discharge List", Icon: "fas fa-plus-circle", IsLoading: true },
+        },
+    },
+    {
+        ID:    "GopherSearch",
+        Label: "Gopher Search",
+        Icon:  "fas fa-chart-line",
+    },
+    {
+        ID:    "GopherRecords",
+        Label: "Gopher Records",
+        Icon:  "fas fa-user-injured",
+        IsDefaultExpanded: true,
+        Children: []NavItem{
+            {ID: "LabResults", Label: "Lab Results", Icon: "fas fa-list", IsLoading: true },
+        },
+    },
 }
