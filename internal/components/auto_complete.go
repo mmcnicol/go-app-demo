@@ -27,6 +27,7 @@ type Autocomplete struct {
 	UseMockData  bool          // Use mock data instead of API
 	MockData     []string      // Custom mock data
 	Placeholder  string        // Input placeholder text
+	OnSelect     func(id, label, value string) // Callback for selection
 
 	// Internal State
 	query      string
@@ -279,12 +280,14 @@ func (a *Autocomplete) onSelect(ctx app.Context, index int) {
 	if index < len(a.results) {
 		a.selectedID = a.results[index].ID
 		
-		// In go-app v10, we can use Dispatch to send an action
-		ctx.Dispatch(func(ctx app.Context) {
-			// You can handle the selection here or in parent component
-			// For example, trigger navigation or update state
-			app.Logf("Autocomplete selected: %s (ID: %s)", a.results[index].Label, a.results[index].ID)
-		})
+		// Call callback if set
+		if a.OnSelect != nil {
+			a.OnSelect(
+				a.results[index].ID,
+				a.results[index].Label,
+				a.results[index].Value,
+			)
+		}
 	}
 	
 	ctx.Update()
@@ -363,15 +366,13 @@ func (a *Autocomplete) renderOption(text string) app.UI {
 }
 
 // SetQuery allows programmatically setting the query
-func (a *Autocomplete) SetQuery(query string) {
+func (a *Autocomplete) SetQuery(ctx app.Context, query string) {
 	a.query = query
-	a.Defer(func(ctx app.Context) {
-		ctx.Update()
-	})
+	ctx.Update()
 }
 
 // Clear clears the query and results
-func (a *Autocomplete) Clear() {
+func (a *Autocomplete) Clear(ctx app.Context) {
 	a.query = ""
 	a.options = nil
 	a.results = nil
@@ -379,9 +380,7 @@ func (a *Autocomplete) Clear() {
 	a.isLoading = false
 	a.errorMsg = ""
 	a.selectedID = ""
-	a.Defer(func(ctx app.Context) {
-		ctx.Update()
-	})
+	ctx.Update()
 }
 
 // GetQuery returns the current query

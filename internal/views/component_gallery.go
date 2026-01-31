@@ -159,22 +159,19 @@ func (g *ComponentGallery) renderSelectedComponent() app.UI {
         return components.NewAutocompleteWithMock()
         
     case "Autocomplete-API":
-		return components.NewAutocomplete("/api/autocomplete")
-		
-	case "Autocomplete-Mock":
-		return components.NewAutocompleteWithMock()
-		
-	case "Autocomplete-Custom":
-		return &components.Autocomplete{
-			UseMockData: true,
-			MockData: []string{
-				"Patient Records",
-				"Lab Results",
-				"Medication List",
-			},
-			Placeholder: "Search clinical terms...",
-			MinChars: 1,
-		}
+        return components.NewAutocomplete("/api/autocomplete")
+        
+    case "Autocomplete-Mock":
+        return components.NewAutocompleteWithMock()
+        
+    case "Autocomplete-Callback":
+        return &components.Autocomplete{
+            UseMockData: true,
+            Placeholder: "Search with callback...",
+            OnSelect: func(id, label, value string) {
+                app.Logf("Selected: %s (ID: %s, Value: %s)", label, id, value)
+            },
+        }
 
     default:
         return app.Div().Class("component-instructions").Body(
