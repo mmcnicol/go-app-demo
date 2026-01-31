@@ -7,9 +7,10 @@ import (
 
 type LeftNavigation struct {
 	app.Compo
-	Items        []models.NavItem
-	ActiveItemID string // Managed internally
+	Items         []models.NavItem
+	ActiveItemID  string // Managed internally
 	ExpandedSecID string // Managed internally
+	isMounted     bool // Managed internally
 }
 
 // NewLeftNavigation creates a new LeftNavigation component
@@ -21,7 +22,7 @@ func NewLeftNavigation(items []models.NavItem) *LeftNavigation {
 	}
 	
 	// Initialize state immediately in constructor, not in OnMount
-	nav.initializeState()
+	//nav.initializeState()
 	
 	return nav
 }
@@ -73,11 +74,9 @@ func (n *LeftNavigation) OnMount(ctx app.Context) {
 	app.Log("[LeftNavigation OnMount] Current ActiveItemID:", n.ActiveItemID)
 	app.Log("[LeftNavigation OnMount] Current ExpandedSecID:", n.ExpandedSecID)
 	
-	// If state wasn't initialized (shouldn't happen with new constructor), initialize it
-	if n.ActiveItemID == "" && n.ExpandedSecID == "" {
-		app.Log("[LeftNavigation OnMount] State not initialized, initializing now")
-		n.initializeState()
-	}
+	app.Log("[LeftNavigation OnMount] initializing state")
+	n.initializeState()
+	n.isMounted = true
 }
 
 // OnNav handles navigation changes from browser history

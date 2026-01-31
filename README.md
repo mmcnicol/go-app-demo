@@ -407,3 +407,15 @@ func (w *wrapper) Render() app.UI {
 // &wrapper{ Content: app.Text("Hello World") }
 ```
 
+## the Observer pattern
+
+In go-app, the Observer pattern is a fundamental alternative to callbacks and is often the preferred approach for managing state changes and communication between components.
+
+The Observer pattern in go-app allows components to subscribe to state changes and get notified when those changes occur, rather than passing callbacks down through the component tree.
+
+Key Components:
+* Observable: A source that holds state and can be observed
+* Observer: Components that subscribe to the observable
+* Notification: When the observable state changes, all observers are notified
+
+
