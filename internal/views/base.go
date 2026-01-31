@@ -150,7 +150,6 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 		b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
 		b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 		b.activeID = "RecentGophers"
-		b.expandedSecID = "GopherLists"
 		
 		// Trigger a re-render
 		ctx.Update()
