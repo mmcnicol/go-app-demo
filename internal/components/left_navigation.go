@@ -13,6 +13,9 @@ type LeftNavigation struct {
 }
 
 func NewLeftNavigation(items []models.NavItem, activeItemID string, expandedSecID string) *LeftNavigation {
+	app.Log("[LeftNavigation New] Creating with", len(items), "items")
+	app.Log("[LeftNavigation New] ActiveItemID:", activeItemID)
+	app.Log("[LeftNavigation New] ExpandedSecID:", expandedSecID)
 	return &LeftNavigation{
 		Items:         items,
 		ActiveItemID:  activeItemID,
@@ -22,9 +25,22 @@ func NewLeftNavigation(items []models.NavItem, activeItemID string, expandedSecI
 
 // OnMount handles the "Default Expanded" requirement
 func (n *LeftNavigation) OnMount(ctx app.Context) {
-	for _, item := range n.Items {
+	app.Log("[LeftNavigation OnMount] Called")
+	app.Log("[LeftNavigation OnMount] Current ExpandedSecID:", n.ExpandedSecID)
+	app.Log("[LeftNavigation OnMount] Items count:", len(n.Items))
+	
+	// If ExpandedSecID is already set (e.g., from props), use it
+	if n.ExpandedSecID != "" {
+		app.Log("[LeftNavigation OnMount] ExpandedSecID already set to:", n.ExpandedSecID)
+		return
+	}
+	
+	// Otherwise, find first item with IsDefaultExpanded
+	for i, item := range n.Items {
+		app.Log("[LeftNavigation OnMount] Checking item", i, "ID:", item.ID, "IsDefaultExpanded:", item.IsDefaultExpanded)
 		if item.IsDefaultExpanded && len(item.Children) > 0 {
 			n.ExpandedSecID = item.ID
+			app.Log("[LeftNavigation OnMount] Setting ExpandedSecID to:", item.ID, "based on IsDefaultExpanded")
 			break
 		}
 	}
@@ -60,6 +76,22 @@ func (n *LeftNavigation) OnNav(ctx app.Context) {
 }
 
 func (n *LeftNavigation) Render() app.UI {
+	app.Log("[LeftNavigation Render] Called")
+	app.Log("[LeftNavigation Render] Items count:", len(n.Items))
+	app.Log("[LeftNavigation Render] ActiveItemID:", n.ActiveItemID)
+	app.Log("[LeftNavigation Render] ExpandedSecID:", n.ExpandedSecID)
+	
+	// Log all item IDs for debugging
+	for i, item := range n.Items {
+		app.Log("[LeftNavigation Render] Item", i, "ID:", item.ID, "Label:", item.Label)
+		if len(item.Children) > 0 {
+			app.Log("[LeftNavigation Render]   Children:", len(item.Children))
+			for j, child := range item.Children {
+				app.Log("[LeftNavigation Render]     Child", j, "ID:", child.ID, "Label:", child.Label)
+			}
+		}
+	}
+	
 	return app.Nav().Class("nav-sidebar").Body(
 		app.Ul().Class("nav-list").Body(
 			app.Range(n.Items).Slice(func(i int) app.UI {
@@ -74,7 +106,12 @@ func (n *LeftNavigation) renderItem(item models.NavItem, isChild bool) app.UI {
 	hasChildren := len(item.Children) > 0
 	isExpanded := n.ExpandedSecID == item.ID
 	isSelected := n.ActiveItemID == item.ID
-
+	
+	app.Log("[LeftNavigation renderItem] Rendering item:", item.ID, "Label:", item.Label)
+	app.Log("[LeftNavigation renderItem]   hasChildren:", hasChildren)
+	app.Log("[LeftNavigation renderItem]   isExpanded:", isExpanded, "(ExpandedSecID:", n.ExpandedSecID, "item.ID:", item.ID, ")")
+	app.Log("[LeftNavigation renderItem]   isSelected:", isSelected)
+	
 	// Build conditional class string
 	itemClass := "nav-item"
 	if isSelected {
@@ -91,6 +128,7 @@ func (n *LeftNavigation) renderItem(item models.NavItem, isChild bool) app.UI {
 		app.Div().
 			Class(itemClass).
 			OnClick(func(ctx app.Context, e app.Event) {
+				app.Log("[LeftNavigation handleItemClick] Clicked on item:", item.ID, "Label:", item.Label)
 				n.handleItemClick(ctx, item)
 			}).
 			Body(
@@ -116,6 +154,7 @@ func (n *LeftNavigation) renderItem(item models.NavItem, isChild bool) app.UI {
 						} else {
 							chevronClass += " fa-chevron-right"
 						}
+						app.Log("[LeftNavigation renderItem]   Chevron class:", chevronClass)
 						return app.I().Class(chevronClass)
 					},
 				),
@@ -123,6 +162,7 @@ func (n *LeftNavigation) renderItem(item models.NavItem, isChild bool) app.UI {
 		// Submenu (The Accordion Content)
 		app.If(hasChildren && isExpanded,
 			func() app.UI {
+				app.Log("[LeftNavigation renderItem]   Rendering children for:", item.ID)
 				return app.Ul().Class("nav-submenu").Body(
 					app.Range(item.Children).Slice(func(j int) app.UI {
 						return n.renderItem(item.Children[j], true)
@@ -134,18 +174,28 @@ func (n *LeftNavigation) renderItem(item models.NavItem, isChild bool) app.UI {
 }
 
 func (n *LeftNavigation) handleItemClick(ctx app.Context, item models.NavItem) {
+	app.Log("[LeftNavigation handleItemClick] START")
+	app.Log("[LeftNavigation handleItemClick] Item ID:", item.ID, "Label:", item.Label)
+	app.Log("[LeftNavigation handleItemClick] Current ExpandedSecID:", n.ExpandedSecID)
+	app.Log("[LeftNavigation handleItemClick] Current ActiveItemID:", n.ActiveItemID)
+	app.Log("[LeftNavigation handleItemClick] Has children:", len(item.Children) > 0)
+	
 	// 1. If it's a section (has children), toggle accordion
 	if len(item.Children) > 0 {
+		app.Log("[LeftNavigation handleItemClick] Item has children, toggling accordion")
 		if n.ExpandedSecID == item.ID {
 			// If already open, close it
+			app.Log("[LeftNavigation handleItemClick] Closing section:", item.ID)
 			n.ExpandedSecID = ""
 		} else {
 			// Open this one, which automatically collapses any other
 			// because ExpandedSecID can only hold one value.
+			app.Log("[LeftNavigation handleItemClick] Opening section:", item.ID)
 			n.ExpandedSecID = item.ID
 		}
 	} else {
 		// 2. If it's a clickable item, mark as selected
+		app.Log("[LeftNavigation handleItemClick] Setting ActiveItemID to:", item.ID)
 		n.ActiveItemID = item.ID
 
 		// Optional: Logic to trigger your eager-loading feature here
@@ -154,11 +204,15 @@ func (n *LeftNavigation) handleItemClick(ctx app.Context, item models.NavItem) {
 
 		// Navigation
 		if item.Route != "" {
+			app.Log("[LeftNavigation handleItemClick] Navigating to route:", item.Route)
 			ctx.Navigate(item.Route)
 		} else {
+			app.Log("[LeftNavigation handleItemClick] Navigating to ID:", item.ID)
 			ctx.Navigate(item.ID)
 		}
 	}
+	
+	app.Log("[LeftNavigation handleItemClick] END - New ExpandedSecID:", n.ExpandedSecID, "New ActiveItemID:", n.ActiveItemID)
 	ctx.Update() // Trigger re-render
 }
 
@@ -257,12 +311,21 @@ func (c *ClassBuilder) String() string {
 
 // SetItems allows updating navigation items dynamically
 func (n *LeftNavigation) SetItems(ctx app.Context, items []models.NavItem) {
+	app.Log("[LeftNavigation SetItems] Called with", len(items), "items")
 	n.Items = items
 	ctx.Update()
 }
 
 // SetActiveItem allows programmatically setting active item
 func (n *LeftNavigation) SetActiveItem(ctx app.Context, itemID string) {
+	app.Log("[LeftNavigation SetActiveItem] Setting ActiveItemID to:", itemID)
 	n.ActiveItemID = itemID
+	ctx.Update()
+}
+
+// SetExpandedSection allows programmatically setting expanded section
+func (n *LeftNavigation) SetExpandedSection(ctx app.Context, sectionID string) {
+	app.Log("[LeftNavigation SetExpandedSection] Setting ExpandedSecID to:", sectionID)
+	n.ExpandedSecID = sectionID
 	ctx.Update()
 }

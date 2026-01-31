@@ -85,7 +85,6 @@ func (b *BasePage) Render() app.UI {
 			default:
 				content = &components.NotFoundComponent{}
 			}
-			//b.gopherDemographics = b.fetchGophersDemographics()
 			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 			b.activeID = "LabResults"
 			b.expandedSecID = "GopherRecords"
@@ -133,7 +132,7 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 		b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
 		b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 		b.activeID = "RecentGophers"
-		b.expandedSecID = "GophersLists"
+		b.expandedSecID = "GopherLists"
 		
 		// Trigger a re-render
 		ctx.Update()
@@ -163,12 +162,6 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 	
 	app.Log("[BasePage] Quick searching for patient:", patientID)
 	
-	// In a real app, you would:
-	// 1. Search for the patient in your database
-	// 2. Load patient data into state
-	// 3. Navigate to patient view
-	// 4. Update navigation context
-	
 	// For demo, just show a message
 	ctx.Async(func() {
 		app.Log("[BasePage handleQuickSearch async] Starting search simulation")
@@ -184,11 +177,12 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 			app.Log("[BasePage handleQuickSearch dispatch] Updating state")
 			app.Log("[BasePage handleQuickSearch dispatch] Old gopherDemographics:", b.gopherDemographics)
 			app.Log("[BasePage handleQuickSearch dispatch] Old activeID:", b.activeID)
+			app.Log("[BasePage handleQuickSearch dispatch] Old expandedSecID:", b.expandedSecID)
 			
 			b.gopherDemographics = newGopherDemographics
 			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 			b.activeID = "LabResults" // Set default active item for gopher context
-			b.expandedSecID = "GophersRecords" // Expand the gopher records section
+			b.expandedSecID = "GopherRecords"
 			
 			app.Log("[BasePage handleQuickSearch dispatch] New gopherDemographics:", b.gopherDemographics)
 			app.Log("[BasePage handleQuickSearch dispatch] New activeID:", b.activeID)
@@ -196,15 +190,7 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 			app.Log("[BasePage handleQuickSearch dispatch] Navigation items updated to gopher context")
 		})
 		
-		// You could show a notification or update state
 		app.Log("[BasePage] Found patient:", patientID)
-		
-		// Example: Navigate to patient view
-		// ctx.Navigate("/patient/" + patientID)
-		
-		// Or update current view
-		// b.loadPatientData(patientID)
-		//ctx.Update()
 	})
 	
 	return nil
