@@ -1,6 +1,7 @@
 package views
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
@@ -80,7 +81,7 @@ func (g *ComponentGallery) Render() app.UI {
 			).ElseIf(g.selectedComponent == "LoginForm",
 				func() app.UI {
 					// Create a mock login handler for the gallery
-					mockHandler := func(username, password string) (*models.User, error) {
+					mockHandler := func(ctx app.Context, username, password string) (*models.User, error) {
 						if username == "demo" && password == "demo" {
 							return &models.User{
 								Username: username,
