@@ -1,6 +1,7 @@
 package views
 
 import (
+	"fmt"
 	"time"
 	
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
@@ -25,11 +26,13 @@ func (b *BasePage) Render() app.UI {
 
 	// Check if user is nil (using pointer)
 	if b.user == nil {
+		// Create login form with callback to BasePage's login method
+		loginForm := components.NewLoginForm(b.handleLogin)
 		return &components.PageLayout{
 			ApplicationBanner: components.NewApplicationBanner("Gopher Portal"),
 			LeftNavigation:    nil,
 			GopherBanner:      nil,
-			Body:              components.NewLoginForm(),
+			Body:              loginForm,
 			PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 		}
 	} else {
@@ -79,32 +82,55 @@ func (b *BasePage) Render() app.UI {
 	}
 }
 
+// handleLogin is the callback function passed to LoginForm
+func (b *BasePage) handleLogin(ctx app.Context, username, password string) (*models.User, error) {
+	// This is where you would integrate with your authentication system
+	// For now, we'll use a simple mock
+	
+	if username == "" || password == "" {
+		return nil, fmt.Errorf("username and password are required")
+	}
+	
+	// Simple mock authentication
+	if username == "demo" && password == "demo" {
+		user := &models.User{
+			Username: username,
+			Name:     "Demo User",
+			Email:    "demo@example.com",
+		}
+		
+		// Set the user on BasePage
+		b.user = user
+		
+		// Initialize other data
+		b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
+		b.navItemsGopherContext = b.fetchNavItemsGopherContext()
+		b.activeID = "RecentGophers"
+		b.expandedSecID = "GophersLists"
+		
+		// Trigger a re-render
+		ctx.Update()
+		
+		return user, nil
+	}
+	
+	return nil, fmt.Errorf("invalid credentials")
+}
+
 // OnMount is called when the component is first loaded
 func (b *BasePage) OnMount(ctx app.Context) {
-    /*
-	// Initialize user state - check if user is logged in
-    // This is just a placeholder - you'd typically check session/cookie
-    // For now, we'll set a mock user for testing
-    b.user = &models.User{
-        ID:    "user-001",
-        Name:  "Demo User",
-        Email: "demo@example.com",
-    }
-    
-    // Initialize other data
-    b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
-    b.navItemsGopherContext = b.fetchNavItemsGopherContext()
-    b.activeID = "RecentGophers"
-    b.expandedSecID = "GophersLists"
-    
-    ctx.Update()
-	*/
+	// We could check for existing session/cookie here
+	// For demo purposes, we'll start with no user logged in
+	b.user = nil
+	ctx.Update()
 }
 
 // OnNav is called on Browser Refresh button click or Back button click
 func (b *BasePage) OnNav(ctx app.Context) {
-
-    b.activeID = "RecentGophers"
+	// We could check for existing session/cookie here
+	// For demo purposes, we'll start with no user logged in
+	b.user = nil
+    //b.activeID = "RecentGophers"
     ctx.Update()
 }
 
