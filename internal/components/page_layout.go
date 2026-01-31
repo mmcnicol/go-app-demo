@@ -15,11 +15,11 @@ type PageLayout struct {
 
 func NewPageLayout(body app.UI) *PageLayout {
     return &PageLayout{
-        applicationBanner: NewApplicationBanner(),
+        applicationBanner: NewApplicationBanner("Application Banner"),
         leftNavigation:    NewLeftNavigation([]models.NavItem{}, "", ""),
-        gopherBanner:      NewGopherBanner(),
+        gopherBanner:      NewGopherBanner(nil),
         Body:              body,
-        pageFooter:        NewPageFooter(),
+        pageFooter:        NewPageFooter("Page Footer"),
     }
 }
 
@@ -60,27 +60,27 @@ func (p *PageLayout) Render() app.UI {
 }
 
 // Setter methods to update components
-func (p *PageLayout) SetBody(body app.UI) {
+func (p *PageLayout) SetBody(ctx app.Context, body app.UI) {
     p.Body = body
-    p.Update()
+    ctx.Update()
 }
 
-func (p *PageLayout) SetLeftNavigation(nav *LeftNavigation) {
+func (p *PageLayout) SetLeftNavigation(ctx app.Context, nav *LeftNavigation) {
     p.leftNavigation = nav
-    p.Update()
+    ctx.Update()
 }
 
-func (p *PageLayout) SetApplicationBanner(banner *ApplicationBanner) {
+func (p *PageLayout) SetApplicationBanner(ctx app.Context, banner *ApplicationBanner) {
     p.applicationBanner = banner
-    p.Update()
+    ctx.Update()
 }
 
-func (p *PageLayout) SetGopherBanner(banner *GopherBanner) {
+func (p *PageLayout) SetGopherBanner(ctx app.Context, banner *GopherBanner) {
     p.gopherBanner = banner
-    p.Update()
+    ctx.Update()
 }
 
-func (p *PageLayout) SetPageFooter(footer *PageFooter) {
+func (p *PageLayout) SetPageFooter(ctx app.Context, footer *PageFooter) {
     p.pageFooter = footer
-    p.Update()
+    ctx.Update()
 }

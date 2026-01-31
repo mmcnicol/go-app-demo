@@ -19,7 +19,7 @@ func (a *ApplicationBanner) Render() app.UI {
             app.H1().Text(a.Title),
         ),
         app.Div().Class("banner-right").Body(
-            app.Span().Text("Welcome, " + a.UserName),
+            app.Span().Text("logout"),
         ),
     )
 }
