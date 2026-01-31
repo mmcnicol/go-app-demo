@@ -3,15 +3,21 @@ package main
 import (
 	"log"
 	"net/http"
-
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"go-app-demo/internal/pages"
 )
 
 func main() {
-	// The Handler is the core of go-app server-side.
-	// It automatically serves the Wasm binary and static resources.
-	appHandler := &app.Handler{
-		Name:        "Go-App demo",
+	// CRITICAL: The server MUST know the route exists
+	//app.Route("/", &Home{})
+	//app.Route("/", func() app.Composer { return &Home{} })
+	// Register the components that correspond to routes
+	app.Route("/", func() app.Composer { return &pages.LoginPage{} })
+	app.Route("/home", func() app.Composer { return &pages.HomePage{} })
+	app.Route("/dev/storybook", func() app.Composer { return &pages.ComponentGallery{} })
+
+	h := &app.Handler{
+		Name:      "Clinical Portal",
 		Description: "A minimalist prototype using Go and WebAssembly",
 		Author:      "mmcnicol",
 		Styles: []string{
@@ -20,18 +26,16 @@ func main() {
 		Icon: app.Icon{
 			Default: "/web/images/logo.png",
 		},
+		//Resources: app.LocalDir("web"),
 	}
 
-	// Setup standard HTTP routes
-	http.Handle("/", appHandler)
-	
+	http.Handle("/", h)
+
 	// Example API endpoint
 	http.HandleFunc("/api/data", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"status": "ok"}`))
 	})
-
-	log.Println("Server started on :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
-	}
+	
+	log.Println("Serving at http://localhost:8080")
+	http.ListenAndServe(":8080", nil)
 }
