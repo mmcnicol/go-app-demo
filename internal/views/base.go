@@ -26,9 +26,9 @@ func (b *BasePage) Render() app.UI {
 
 	// temp hack
 	user := &models.User{
-		Username: username,
+		Username: "duser2",
 		Forename: "Demo",
-		Surname:  "User",
+		Surname:  "User2",
 	}
 	
 	// Set the user on BasePage
