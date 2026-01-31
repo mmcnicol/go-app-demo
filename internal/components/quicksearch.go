@@ -56,6 +56,7 @@ func NewQuickSearch(onSearch QuickSearchHandler) *QuickSearch {
 }
 
 func (q *QuickSearch) Render() app.UI {
+	app.Log("[QuickSearch Render] Rendering with SearchTerm:", q.SearchTerm, "Error:", q.Error, "IsLoading:", q.IsLoading)
 	return app.Div().Class("quick-search").Body(
 		app.Div().Class("search-container").Body(
 			app.Input().
@@ -93,7 +94,7 @@ func (q *QuickSearch) Render() app.UI {
 
 func (q *QuickSearch) onSearchTermChange(ctx app.Context, e app.Event) {
 	value := ctx.JSSrc().Get("value").String()
-	app.Log("[QuickSearch] onSearchTermChange called, value:", value)
+	app.Log("[QuickSearch] onSearchTermChange called, value:", value, "length:", len(value))
 	
 	// Only allow numeric input (for patient IDs)
 	if !q.isValidInput(value) {
@@ -111,13 +112,17 @@ func (q *QuickSearch) onSearchTermChange(ctx app.Context, e app.Event) {
 	
 	q.SearchTerm = value
 	q.Error = "" // Clear error when user types
-	app.Log("[QuickSearch] Search term updated to:", q.SearchTerm)
+	app.Log("[QuickSearch] Search term updated to:", q.SearchTerm, "length:", len(q.SearchTerm))
 	ctx.Update()
 }
 
 func (q *QuickSearch) onKeyPress(ctx app.Context, e app.Event) {
 	keyCode := e.Get("keyCode").Int()
-	app.Log("[QuickSearch] onKeyPress called, keyCode:", keyCode)
+	// Only log non-character keys to reduce noise
+	if keyCode != 13 { // Don't log Enter key here
+		app.Log("[QuickSearch] onKeyPress called, keyCode:", keyCode)
+	}
+	
 	// Allow Enter key to trigger search
 	if keyCode == 13 { // Enter key
 		app.Log("[QuickSearch] Enter key pressed, triggering search")
@@ -127,8 +132,22 @@ func (q *QuickSearch) onKeyPress(ctx app.Context, e app.Event) {
 }
 
 func (q *QuickSearch) onSearchClick(ctx app.Context, e app.Event) {
-	app.Log("[QuickSearch] onSearchClick called")
+	app.Log("[QuickSearch] onSearchClick called, current SearchTerm:", q.SearchTerm, "length:", len(q.SearchTerm))
 	e.PreventDefault()
+	
+	// IMPORTANT: Get the current value from the input element directly
+	// This ensures we have the latest value even if onSearchTermChange hasn't fired yet
+	currentValue := ctx.JSSrc().Call("closest", ".search-container").
+		Call("querySelector", ".search-input").
+		Get("value").String()
+	
+	app.Log("[QuickSearch] Current input value from DOM:", currentValue)
+	
+	// Update the SearchTerm with the DOM value to ensure synchronization
+	if currentValue != q.SearchTerm {
+		app.Log("[QuickSearch] Synchronizing SearchTerm from DOM:", currentValue)
+		q.SearchTerm = currentValue
+	}
 	
 	// Validate input
 	if err := q.validate(); err != nil {
@@ -156,7 +175,7 @@ func (q *QuickSearch) onSearchClick(ctx app.Context, e app.Event) {
 }
 
 func (q *QuickSearch) performSearch(ctx app.Context) {
-	app.Log("[QuickSearch] performSearch started")
+	app.Log("[QuickSearch] performSearch started, SearchTerm:", q.SearchTerm)
 	defer func() {
 		app.Log("[QuickSearch] performSearch completed, setting isLoading=false")
 		ctx.Async(func() {
@@ -166,7 +185,7 @@ func (q *QuickSearch) performSearch(ctx app.Context) {
 	}()
 	
 	// Call the provided search handler
-	app.Log("[QuickSearch] Calling OnSearch handler")
+	app.Log("[QuickSearch] Calling OnSearch handler with:", q.SearchTerm)
 	err := q.OnSearch(ctx, q.SearchTerm)
 	if err != nil {
 		app.Log("[QuickSearch] OnSearch returned error:", err.Error())
@@ -181,9 +200,9 @@ func (q *QuickSearch) performSearch(ctx app.Context) {
 	
 	// Success - clear the search term
 	ctx.Async(func() {
+		app.Log("[QuickSearch] Clearing search term and showing success message")
 		q.SearchTerm = ""
 		q.Error = "Patient found! Loading..."
-		app.Log("[QuickSearch] UI updated: search term cleared, loading message set")
 		ctx.Update()
 	})
 }
