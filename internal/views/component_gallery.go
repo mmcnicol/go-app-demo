@@ -71,21 +71,18 @@ func (g *ComponentGallery) Render() app.UI {
 // Then add this helper method:
 func (g *ComponentGallery) renderSelectedComponent() app.UI {
     switch g.selectedComponent {        
-    case "Navbar":
-        navbar := &components.Navbar{}
-        navbar.Title = "My Navbar"
-        return navbar
-        
     case "ApplicationBanner":
         return components.NewApplicationBanner(
             "Component Gallery",
             g.mockQuickSearchHandler,
             g.mockLogoutHandler,
         )
-        
+    
+	/*
     case "QuickSearch":
         return components.NewQuickSearch(g.mockQuickSearchHandler)
-        
+    */
+
     case "QuickSearch-Mock":
         return components.NewQuickSearch(func(ctx app.Context, searchTerm string) error {
             app.Log("Mock search for:", searchTerm)
