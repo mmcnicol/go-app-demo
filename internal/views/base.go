@@ -121,7 +121,13 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 func (b *BasePage) OnMount(ctx app.Context) {
 	// We could check for existing session/cookie here
 	// For demo purposes, we'll start with no user logged in
-	b.user = nil
+	//b.user = nil
+	b.user = &models.User{
+		Username: "iamcheating",
+		Forename: "I'm",
+		Surname:  "Cheating",
+	}
+
 	ctx.Update()
 }
 
