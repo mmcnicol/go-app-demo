@@ -23,10 +23,6 @@ func (g *ComponentGallery) Render() app.UI {
 				g.selectedComponent = "UserTable"
 				ctx.Update()
 			}),
-			app.Button().Text("Navbar").OnClick(func(ctx app.Context, e app.Event) {
-				g.selectedComponent = "Navbar"
-				ctx.Update()
-			}),
 			app.Button().Text("Application Banner").OnClick(func(ctx app.Context, e app.Event) {
 				g.selectedComponent = "ApplicationBanner"
 				ctx.Update()
@@ -72,10 +68,6 @@ func (g *ComponentGallery) Render() app.UI {
 						SortBy:      "name",
 						SortOrder:   "asc",
 					}
-				},
-			).ElseIf(g.selectedComponent == "Navbar",
-				func() app.UI {
-					return &components.Navbar{}
 				},
 			).ElseIf(g.selectedComponent == "ApplicationBanner",
 				func() app.UI {

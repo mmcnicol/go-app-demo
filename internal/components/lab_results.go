@@ -11,7 +11,7 @@ import (
 // &LabResults{ labResults: data }
 type LabResults struct {
 	app.Compo
-	labResults  []models.LabResultItem
+	LabResults  []models.LabResultItem
 	SortBy      string
     SortOrder   string // "asc" or "desc"
     Loading     bool
@@ -49,13 +49,13 @@ func (l *LabResults) Render() app.UI {
 						app.Td().ColSpan(3).Text("Loading..."),
 					)
 				}),
-                app.If(len(l.labResults)==0, func() app.UI {
+                app.If(len(l.LabResults)==0, func() app.UI {
 					return app.Tr().Body(
 						app.Td().ColSpan(3).Text("No Results Found."),
 					)
 				}),
-				app.Range(l.labResults).Slice(func(i int) app.UI {
-					row := l.labResults[i]
+				app.Range(l.LabResults).Slice(func(i int) app.UI {
+					row := l.LabResults[i]
 					reportDateFormatted := row.ReportDate.Format("02/01/2006")
 					return app.Tr().Body(
 						app.Td().Text(row.ID),
@@ -95,9 +95,9 @@ func (l *LabResults) sortData() {
         return // No sort selected
     }
 
-    sort.Slice(l.labResults, func(i, j int) bool {
-        a := l.labResults[i]
-        b := l.labResults[j]
+    sort.Slice(l.LabResults, func(i, j int) bool {
+        a := l.LabResults[i]
+        b := l.LabResults[j]
 
         var less bool
         
