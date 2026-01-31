@@ -19,14 +19,12 @@ type BasePage struct {
 	recentGophers            []models.RecentGopherItem
 	labResults               []models.LabResultItem
 	
-	// Store navigation component instances
-	leftNavigationGopher    *components.LeftNavigation
-	leftNavigationNonGopher *components.LeftNavigation
+	// Store navigation component instance
+	leftNavigation    *components.LeftNavigation
 }
 
 func (b *BasePage) Render() app.UI {
     var content app.UI
-    var leftNav *components.LeftNavigation
 
 	// temp hack
 	user := &models.User{
@@ -66,15 +64,14 @@ func (b *BasePage) Render() app.UI {
 			app.Log("[BasePage Render] Navigation items:", len(b.navItemsNonGopherContext))
 			
 			// Create or reuse non-gopher navigation
-			if b.leftNavigationNonGopher == nil {
+			if b.leftNavigation == nil {
 				app.Log("[BasePage Render] Creating new non-gopher navigation")
-				b.leftNavigationNonGopher = components.NewLeftNavigation(b.navItemsNonGopherContext)
+				b.leftNavigation = components.NewLeftNavigation(b.navItemsNonGopherContext)
 			} else {
 				app.Log("[BasePage Render] Reusing non-gopher navigation")
 				// Update items if needed
-				b.leftNavigationNonGopher.SetItems(nil, b.navItemsNonGopherContext)
+				b.leftNavigation.SetItems(nil, b.navItemsNonGopherContext)
 			}
-			leftNav = b.leftNavigationNonGopher
 			
 		} else {
 			// Contextual Routing Logic
@@ -96,15 +93,14 @@ func (b *BasePage) Render() app.UI {
 			app.Log("[BasePage Render] Active ID:", b.activeID)
 			
 			// Create or reuse gopher navigation
-			if b.leftNavigationGopher == nil {
+			if b.leftNavigation == nil {
 				app.Log("[BasePage Render] Creating new gopher navigation")
-				b.leftNavigationGopher = components.NewLeftNavigation(b.navItemsGopherContext)
+				b.leftNavigation = components.NewLeftNavigation(b.navItemsGopherContext)
 			} else {
 				app.Log("[BasePage Render] Reusing gopher navigation")
 				// Update items if needed
-				b.leftNavigationGopher.SetItems(nil, b.navItemsGopherContext)
+				b.leftNavigation.SetItems(nil, b.navItemsGopherContext)
 			}
-			leftNav = b.leftNavigationGopher
 		}
 		
 		return &components.PageLayout{
@@ -113,7 +109,7 @@ func (b *BasePage) Render() app.UI {
 				b.handleQuickSearch, // Quick search handler
 				b.handleLogout,      // Logout handler
 			),
-			LeftNavigation:    leftNav,
+			LeftNavigation:    b.leftNavigation,
 			GopherBanner:      b.getGopherBanner(),
 			Body:              content,
 			PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
@@ -193,11 +189,11 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 			app.Log("[BasePage handleQuickSearch dispatch] Updating state")
 			
 			b.gopherDemographics = newGopherDemographics
-			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
+			//b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 			b.activeID = "LabResults" // Set default active item for gopher context
 			
 			// Reset gopher navigation to get fresh state
-			b.leftNavigationGopher = nil
+			b.leftNavigation = nil
 			
 			app.Log("[BasePage handleQuickSearch dispatch] Navigation reset for gopher context")
 		})
@@ -220,9 +216,8 @@ func (b *BasePage) handleLogout(ctx app.Context) {
 	b.recentGophers = nil
 	b.labResults = nil
 	
-	// Reset navigation components
-	b.leftNavigationGopher = nil
-	b.leftNavigationNonGopher = nil
+	// Reset navigation component instance
+	b.leftNavigation = nil
 	
 	// Trigger re-render
 	ctx.Update()
@@ -243,8 +238,12 @@ func (b *BasePage) OnMount(ctx app.Context) {
 	b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
 	b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 	b.activeID = "RecentGophers"
-	
-	app.Log("[BasePage OnMount] Navigation initialized")
+	// Create gopher navigation instance
+	if b.leftNavigationGopher == nil {
+		app.Log("[BasePage Render] Creating new gopher navigation")
+		b.leftNavigationGopher = components.NewLeftNavigation(b.navItemsNonGopherContext)
+	}
+	app.Log("[BasePage OnMount] leftNavigation initialized")
 	app.Log("[BasePage OnMount] User set:", b.user)
 	
 	ctx.Update()
