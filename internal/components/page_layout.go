@@ -16,7 +16,7 @@ type PageLayout struct {
 
 func NewPageLayout(body app.UI) *PageLayout {
     return &PageLayout{
-        ApplicationBanner: NewApplicationBanner("Application Banner"),
+        ApplicationBanner: NewApplicationBanner("Application Banner", nil, nil),
         LeftNavigation:    NewLeftNavigation([]models.NavItem{}, "", ""),
         GopherBanner:      NewGopherBanner(&models.GopherDemographics{}),
         Body:              body,

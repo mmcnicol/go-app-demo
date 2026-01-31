@@ -13,7 +13,6 @@ func NewApplicationBanner(title string, onQuickSearch QuickSearchHandler, onLogo
 	banner := &ApplicationBanner{
 		Title:      title,
 		OnLogout:   onLogout,
-		UserName:   "Guest", // Default or fetch from session
 	}
 
     // Create quick search component if handler is provided
@@ -28,7 +27,6 @@ func NewApplicationBanner(title string, onQuickSearch QuickSearchHandler, onLogo
 func NewSimpleApplicationBanner(title string) *ApplicationBanner {
 	return &ApplicationBanner{
 		Title:    title,
-		UserName: "Guest",
 	}
 }
 
@@ -40,7 +38,7 @@ func (a *ApplicationBanner) Render() app.UI {
         app.Div().Class("banner-center").Body(
 			// Could add other elements here if needed
 		),
-        pp.Div().Class("banner-right").Body(
+        app.Div().Class("banner-right").Body(
 			// Quick search component
 			app.If(a.QuickSearch != nil,
 				func() app.UI {
