@@ -19,7 +19,7 @@ type LabResults struct {
 
 func NewLabResults(labResults []models.LabResultItem) *LabResults {
     return &LabResults{
-        labResults: labResults,
+        LabResults: labResults,
     }
 }
 
