@@ -326,6 +326,7 @@ func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
 			ID:        "MySettings",
 			Label:     "My Settings",
 			Icon:      "fas fa-cog",
+			IsDefaultSelected: false,
 			IsLoading: false,
 			Route:     "/settings",
 		},
@@ -333,6 +334,7 @@ func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
 			ID:                "GopherLists",
 			Label:             "Gopher Lists",
 			Icon:              "fas fa-user-injured",
+			IsDefaultSelected: false,
 			IsDefaultExpanded: true, // This section should be expanded by default
 			Route:             "",
 			Children: []models.NavItem{
@@ -348,6 +350,7 @@ func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
 					ID:        "PharmacyDischargeList",
 					Label:     "Pharmacy Discharge List",
 					Icon:      "fas fa-plus-circle",
+					IsDefaultSelected: false,
 					IsLoading: false,
 					Route:     "/pharmacy-discharge",
 				},
@@ -357,6 +360,7 @@ func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
 			ID:        "GopherSearch",
 			Label:     "Gopher Search",
 			Icon:      "fas fa-search",
+			IsDefaultSelected: false,
 			IsLoading: false,
 			Route:     "/search",
 		},
@@ -370,6 +374,7 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 			ID:        "MySettings",
 			Label:     "My Settings",
 			Icon:      "fas fa-cog",
+			IsDefaultSelected: false,
 			IsLoading: false,
 			Route:     "/settings",
 		},
@@ -377,6 +382,7 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 			ID:                "GopherLists",
 			Label:             "Gopher Lists",
 			Icon:              "fas fa-user-injured",
+			IsDefaultSelected: false,
 			IsDefaultExpanded: false, // Not expanded by default in gopher context
 			Route:             "",
 			Children: []models.NavItem{
@@ -384,6 +390,7 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 					ID:        "RecentGophers",
 					Label:     "Recent Gophers",
 					Icon:      "fas fa-list",
+					IsDefaultSelected: false,
 					IsLoading: false,
 					Route:     "/recent-gophers",
 				},
@@ -391,6 +398,7 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 					ID:        "PharmacyDischargeList",
 					Label:     "Pharmacy Discharge List",
 					Icon:      "fas fa-plus-circle",
+					IsDefaultSelected: false,
 					IsLoading: false,
 					Route:     "/pharmacy-discharge",
 				},
@@ -400,6 +408,7 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 			ID:        "GopherSearch",
 			Label:     "Gopher Search",
 			Icon:      "fas fa-search",
+			IsDefaultSelected: false,
 			IsLoading: false,
 			Route:     "/search",
 		},
@@ -407,6 +416,7 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 			ID:                "GopherRecords",
 			Label:             "Gopher Records",
 			Icon:              "fas fa-user-injured",
+			IsDefaultSelected: false,
 			IsDefaultExpanded: true, // This section should be expanded by default in gopher context
 			Route:             "",
 			Children: []models.NavItem{
