@@ -30,7 +30,7 @@ func NewLeftNavigation(items []models.NavItem) *LeftNavigation {
 // initializeState sets initial ActiveItemID and ExpandedSecID based on items
 func (n *LeftNavigation) initializeState() {
 	app.Log("[LeftNavigation initializeState] Called")
-	
+		
 	// Set initial ActiveItemID based on DefaultSelectedID
 	if defaultSelectedID := n.findFirstDefaultSelectedID(n.Items); defaultSelectedID != "" {
         n.ActiveItemID = defaultSelectedID
@@ -93,6 +93,14 @@ func (n *LeftNavigation) OnNav(ctx app.Context) {
 
 func (n *LeftNavigation) Render() app.UI {
 	app.Log("[LeftNavigation Render] Called")
+	app.Log("[LeftNavigation Render] Called, isMounted:", n.isMounted)
+	
+	// Don't render anything until mounted
+	if !n.isMounted {
+		app.Log("[LeftNavigation Render] Not mounted yet, returning loading/empty")
+		return app.Div().Class("nav-sidebar loading")
+	}
+	
 	app.Log("[LeftNavigation Render] Items count:", len(n.Items))
 	app.Log("[LeftNavigation Render] ActiveItemID:", n.ActiveItemID)
 	app.Log("[LeftNavigation Render] ExpandedSecID:", n.ExpandedSecID)
