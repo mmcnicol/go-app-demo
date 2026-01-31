@@ -30,13 +30,11 @@ func NewLeftNavigation(items []models.NavItem) *LeftNavigation {
 func (n *LeftNavigation) initializeState() {
 	app.Log("[LeftNavigation initializeState] Called")
 	
-	// Set initial ActiveItemID based on the first leaf item (non-parent)
-	if len(n.Items) > 0 {
-		if firstLeaf := n.findFirstLeafItem(n.Items); firstLeaf != nil {
-			n.ActiveItemID = firstLeaf.ID
-			app.Log("[LeftNavigation initializeState] Setting initial ActiveItemID:", n.ActiveItemID)
-		}
-	}
+	// Set initial ActiveItemID based on DefaultSelectedID
+	if defaultSelectedID := n.findFirstDefaultSelectedID(n.Items); defaultSelectedID != "" {
+        n.ActiveItemID = defaultSelectedID
+        app.Log("[LeftNavigation initializeState] Setting ActiveItemID from IsDefaultSelected:", defaultSelectedID)
+    }
 	
 	// Find and expand sections with IsDefaultExpanded = true
 	for _, item := range n.Items {
@@ -51,6 +49,24 @@ func (n *LeftNavigation) initializeState() {
 	app.Log("[LeftNavigation initializeState] Final state - ActiveItemID:", n.ActiveItemID, "ExpandedSecID:", n.ExpandedSecID)
 }
 
+func (n *LeftNavigation) findFirstDefaultSelectedID(items []models.NavItem) string {
+    for _, item := range items {
+        // Check if this item has IsDefaultSelected = true
+        if item.IsDefaultSelected {
+            return item.ID
+        }
+        
+        // If item has children, recursively check them
+        if len(item.Children) > 0 {
+            if childID := n.findFirstDefaultSelectedID(item.Children); childID != "" {
+                return childID
+            }
+        }
+    }
+    
+    return ""
+}
+
 // OnMount handles additional initialization if needed
 func (n *LeftNavigation) OnMount(ctx app.Context) {
 	app.Log("[LeftNavigation OnMount] Called")
@@ -62,20 +78,6 @@ func (n *LeftNavigation) OnMount(ctx app.Context) {
 		app.Log("[LeftNavigation OnMount] State not initialized, initializing now")
 		n.initializeState()
 	}
-}
-
-// Helper to find first leaf item (non-parent) in the navigation tree
-func (n *LeftNavigation) findFirstLeafItem(items []models.NavItem) *models.NavItem {
-	for _, item := range items {
-		if len(item.Children) == 0 {
-			return &item
-		}
-		// If item has children, recursively check children
-		if child := n.findFirstLeafItem(item.Children); child != nil {
-			return child
-		}
-	}
-	return nil
 }
 
 // OnNav handles navigation changes from browser history
