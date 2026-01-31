@@ -12,7 +12,7 @@ import (
 )
 
 // Usage:
-// For API endpoint: &components.Autocomplete{Endpoint: "/api/search?q="}
+// For API endpoint: &components.Autocomplete{Endpoint: "/api/search"}
 // For mock data: &components.Autocomplete{UseMockData: true}
 // For demo: components.NewAutocompleteWithMock()
 type Autocomplete struct {
@@ -23,10 +23,11 @@ type Autocomplete struct {
 	Delay        time.Duration // Default: 300ms
 	MaxResults   int           // Default: 10
 	Highlight    bool          // Default: true
-	Endpoint     string        // API URL (e.g., "/api/search?q=")
+	Endpoint     string        // API URL (e.g., "/api/search")
 	UseMockData  bool          // Use mock data instead of API
 	MockData     []string      // Custom mock data
 	Placeholder  string        // Input placeholder text
+	FieldToShow  string        // Which field to display (default: "label")
 
 	// Internal State
 	query      string
@@ -61,6 +62,7 @@ func NewAutocomplete(endpoint string) *Autocomplete {
 		MaxResults:  10,
 		Highlight:   true,
 		Placeholder: "Type to search...",
+		FieldToShow: "label",
 	}
 }
 
@@ -74,6 +76,7 @@ func NewAutocompleteWithMock() *Autocomplete {
 		Highlight:   true,
 		Placeholder: "Type to search (mock data)...",
 		MockData:    defaultMockData(),
+		FieldToShow: "label",
 	}
 }
 
