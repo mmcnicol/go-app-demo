@@ -27,15 +27,16 @@ type Autocomplete struct {
 	UseMockData  bool          // Use mock data instead of API
 	MockData     []string      // Custom mock data
 	Placeholder  string        // Input placeholder text
-	FieldToShow  string        // Which field to display (default: "label")
 
 	// Internal State
 	query      string
-	options    []string
+	options    []string        // Store simple strings for display
+	results    []AutocompleteResult // Store full result objects
 	showPicker bool
 	debounce   *time.Timer
 	isLoading  bool
 	errorMsg   string
+	selectedID string
 }
 
 type AutocompleteResult struct {
@@ -62,7 +63,6 @@ func NewAutocomplete(endpoint string) *Autocomplete {
 		MaxResults:  10,
 		Highlight:   true,
 		Placeholder: "Type to search...",
-		FieldToShow: "label",
 	}
 }
 
@@ -76,7 +76,6 @@ func NewAutocompleteWithMock() *Autocomplete {
 		Highlight:   true,
 		Placeholder: "Type to search (mock data)...",
 		MockData:    defaultMockData(),
-		FieldToShow: "label",
 	}
 }
 
@@ -107,6 +106,7 @@ func (a *Autocomplete) OnInput(ctx app.Context, e app.Event) {
 
 	if len(a.query) < a.MinChars {
 		a.options = nil
+		a.results = nil
 		a.showPicker = false
 		a.isLoading = false
 		return
@@ -152,19 +152,54 @@ func (a *Autocomplete) fetchAPIResults(ctx app.Context) {
 			return
 		}
 
-		// Parse JSON response
-		var response AutocompleteResponse
-		if err := json.Unmarshal(body, &response); err != nil {
+		// Parse JSON response - try both formats
+		// First try the structured response
+		var structuredResponse AutocompleteResponse
+		if err := json.Unmarshal(body, &structuredResponse); err == nil && structuredResponse.Status == "success" {
 			ctx.Dispatch(func(ctx app.Context) {
-				a.errorMsg = fmt.Sprintf("Error parsing JSON: %v", err)
+				a.results = structuredResponse.Data
+				// Convert to simple strings for display
+				a.options = make([]string, len(a.results))
+				for i, result := range a.results {
+					a.options[i] = result.Label
+				}
+				a.showPicker = len(a.results) > 0
+				a.isLoading = false
+			})
+			return
+		}
+
+		// Try simple string array response
+		var simpleResponse map[string]interface{}
+		if err := json.Unmarshal(body, &simpleResponse); err == nil {
+			if data, ok := simpleResponse["data"].([]interface{}); ok {
+				a.options = make([]string, len(data))
+				for i, item := range data {
+					if str, ok := item.(string); ok {
+						a.options[i] = str
+					}
+				}
+				ctx.Dispatch(func(ctx app.Context) {
+					a.showPicker = len(a.options) > 0
+					a.isLoading = false
+				})
+				return
+			}
+		}
+
+		// Last resort: try as simple string array
+		var stringArray []string
+		if err := json.Unmarshal(body, &stringArray); err == nil {
+			ctx.Dispatch(func(ctx app.Context) {
+				a.options = stringArray
+				a.showPicker = len(a.options) > 0
 				a.isLoading = false
 			})
 			return
 		}
 
 		ctx.Dispatch(func(ctx app.Context) {
-			a.results = response.Data
-			a.showPicker = len(a.results) > 0
+			a.errorMsg = "Invalid response format from server"
 			a.isLoading = false
 		})
 	})
@@ -174,22 +209,12 @@ func (a *Autocomplete) fetchMockResults(ctx app.Context) {
 	// Simulate API delay
 	time.Sleep(100 * time.Millisecond)
 	
-	// Generate mock JSON response
-	mockResponse := a.generateMockResponse()
-	
-	ctx.Dispatch(func(ctx app.Context) {
-		a.results = mockResponse.Data
-		a.showPicker = len(a.results) > 0
-		a.isLoading = false
-	})
-}
-
-func (a *Autocomplete) generateMockResponse() AutocompleteResponse {
-	// Generate mock data based on query
-	var results []AutocompleteResult
+	// Generate mock results based on query
 	queryLower := strings.ToLower(a.query)
+	var options []string
+	var results []AutocompleteResult
 	
-	// Base mock data - you can customize this
+	// Base mock data
 	mockItems := []struct {
 		id    string
 		label string
@@ -210,60 +235,49 @@ func (a *Autocomplete) generateMockResponse() AutocompleteResponse {
 	// Filter based on query
 	for _, item := range mockItems {
 		if queryLower == "" || strings.Contains(strings.ToLower(item.label), queryLower) {
+			options = append(options, item.label)
 			results = append(results, AutocompleteResult{
 				ID:    item.id,
 				Label: item.label,
 				Value: item.value,
 			})
-			if len(results) >= a.MaxResults {
+			if len(options) >= a.MaxResults {
 				break
 			}
 		}
 	}
 	
-	return AutocompleteResponse{
-		Status:  "success",
-		Data:    results,
-		Query:   a.query,
-		Count:   len(results),
-		HasMore: len(results) >= a.MaxResults,
-	}
-}
-
-func (a *Autocomplete) onSelect(ctx app.Context, val string) {
-	
-	// Set the display value based on FieldToShow
-	switch a.FieldToShow {
-	case "id":
-		a.query = result.ID
-	case "value":
-		a.query = result.Value
-	default:
-		a.query = result.Label
-	}
-
-	a.selectedID = result.ID
-	a.showPicker = false
-	a.isLoading = false
-	a.errorMsg = ""
-
-	// Emit event with full result object
-	ctx.Emit("autocomplete-select", map[string]interface{}{
-		"id":    result.ID,
-		"label": result.Label,
-		"value": result.Value,
+	ctx.Dispatch(func(ctx app.Context) {
+		a.options = options
+		a.results = results
+		a.showPicker = len(a.options) > 0
+		a.isLoading = false
 	})
 }
 
-func (a *Autocomplete) getDisplayText(result AutocompleteResult) string {
-	switch a.FieldToShow {
-	case "id":
-		return result.ID
-	case "value":
-		return result.Value
-	default:
-		return result.Label
+func (a *Autocomplete) onSelect(ctx app.Context, index int) {
+	if index < 0 || index >= len(a.options) {
+		return
 	}
+	
+	a.query = a.options[index]
+	a.showPicker = false
+	a.isLoading = false
+	a.errorMsg = ""
+	
+	// Store selected ID if we have results
+	if index < len(a.results) {
+		a.selectedID = a.results[index].ID
+		
+		// Dispatch event to parent (using NewAction in v10)
+		ctx.NewAction("autocomplete-select", map[string]interface{}{
+			"id":    a.results[index].ID,
+			"label": a.results[index].Label,
+			"value": a.results[index].Value,
+		})
+	}
+	
+	a.Update()
 }
 
 func (a *Autocomplete) Render() app.UI {
@@ -291,16 +305,16 @@ func (a *Autocomplete) Render() app.UI {
 		),
 		
 		// Results picker
-		app.If(a.showPicker && len(a.results) > 0,
+		app.If(a.showPicker && len(a.options) > 0,
 			func() app.UI {
 				return app.Div().Class("autocomplete-picker").Body(
 					app.Ul().Class("autocomplete-list").Body(
-						app.Range(a.results).Slice(func(i int) app.UI {
-							opt := getDisplayText(a.results[i])
+						app.Range(a.options).Slice(func(i int) app.UI {
+							opt := a.options[i]
 							return app.Li().
 								Class("autocomplete-item").
 								OnClick(func(ctx app.Context, e app.Event) {
-									a.onSelect(ctx, opt)
+									a.onSelect(ctx, i)
 								}).
 								Body(
 									a.renderOption(opt),
@@ -348,9 +362,11 @@ func (a *Autocomplete) SetQuery(query string) {
 func (a *Autocomplete) Clear() {
 	a.query = ""
 	a.options = nil
+	a.results = nil
 	a.showPicker = false
 	a.isLoading = false
 	a.errorMsg = ""
+	a.selectedID = ""
 	a.Update()
 }
 
@@ -362,6 +378,11 @@ func (a *Autocomplete) GetQuery() string {
 // GetSelected returns the selected value (if any)
 func (a *Autocomplete) GetSelected() string {
 	return a.query
+}
+
+// GetSelectedID returns the selected ID (if any)
+func (a *Autocomplete) GetSelectedID() string {
+	return a.selectedID
 }
 
 // defaultMockData returns default mock data for demo purposes
@@ -388,11 +409,4 @@ func defaultMockData() []string {
 		"Ibuprofen",
 		"Penicillin",
 	}
-}
-
-// Add custom CSS styles
-func init() {
-	app.Handle(func(ctx app.Context, action app.Action) {
-		// This ensures CSS is available
-	})
 }

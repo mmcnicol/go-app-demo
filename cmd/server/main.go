@@ -47,7 +47,7 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
-// Mock API handler for autocomplete
+// Mock API handler for autocomplete - updated to match both formats
 func MockAutocompleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Get query parameter
 	query := r.URL.Query().Get("q")
@@ -58,26 +58,34 @@ func MockAutocompleteHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	
 	// Filter mock data based on query
-	var results []string
+	var results []map[string]interface{}
 	queryLower := strings.ToLower(query)
 	
-	mockData := []string{
-		"aaaa",
-		"aaaaa", 
-		"aaaaaa",
-		"bbbb",
-		"bbbbb",
-		"bbbbbb",
-		"Apple",
-		"Banana",
-		"Cherry",
-		"Date",
-		"Elderberry",
+	mockData := []struct {
+		id    string
+		label string
+		value string
+	}{
+		{"1", "aaaa", "value_aaaa"},
+		{"2", "aaaaa", "value_aaaaa"},
+		{"3", "aaaaaa", "value_aaaaaa"},
+		{"4", "bbbb", "value_bbbb"},
+		{"5", "bbbbb", "value_bbbbb"},
+		{"6", "bbbbbb", "value_bbbbbb"},
+		{"7", "Apple", "fruit_apple"},
+		{"8", "Banana", "fruit_banana"},
+		{"9", "Cherry", "fruit_cherry"},
+		{"10", "Date", "fruit_date"},
 	}
 	
+	// Filter based on query
 	for _, item := range mockData {
-		if strings.Contains(strings.ToLower(item), queryLower) {
-			results = append(results, item)
+		if queryLower == "" || strings.Contains(strings.ToLower(item.label), queryLower) {
+			results = append(results, map[string]interface{}{
+				"id":    item.id,
+				"label": item.label,
+				"value": item.value,
+			})
 			if len(results) >= 10 { // Default limit
 				break
 			}
@@ -87,13 +95,14 @@ func MockAutocompleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Simulate network delay
 	time.Sleep(100 * time.Millisecond)
 	
-	// Create JSON response
+	// Create JSON response in structured format
 	response := map[string]interface{}{
-		"status": "success",
-		"data":   results,
-		"query":  query,
-		"count":  len(results),
-		"limit":  limit,
+		"status":  "success",
+		"data":    results,
+		"query":   query,
+		"count":   len(results),
+		"limit":   limit,
+		"has_more": len(results) >= 10,
 	}
 	
 	json.NewEncoder(w).Encode(response)
