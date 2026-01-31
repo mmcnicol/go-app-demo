@@ -217,7 +217,7 @@ func (q *QuickSearch) isValidInput(input string) bool {
 }
 
 // SetSearchTerm allows programmatically setting the search term
-func (q *QuickSearch) SetSearchTerm(ctx app.Context, ctx app.Contextterm string) {
+func (q *QuickSearch) SetSearchTerm(ctx app.Context, term string) {
 	q.SearchTerm = term
 	ctx.Update()
 }

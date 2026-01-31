@@ -19,10 +19,7 @@ func (g *ComponentGallery) Render() app.UI {
 		// Sidebar
 		app.Nav().Class("sidebar").Body(
 			app.H3().Text("My Components"),
-			app.Button().Text("UserTable").OnClick(func(ctx app.Context, e app.Event) {
-				g.selectedComponent = "UserTable"
-				ctx.Update()
-			}),
+			
 			app.Button().Text("Application Banner").OnClick(func(ctx app.Context, e app.Event) {
 				g.selectedComponent = "ApplicationBanner"
 				ctx.Update()
@@ -55,73 +52,112 @@ func (g *ComponentGallery) Render() app.UI {
 				g.selectedComponent = "LabResults-Empty"
 				ctx.Update()
 			}),
+			app.Button().Text("UserTable").OnClick(func(ctx app.Context, e app.Event) {
+				g.selectedComponent = "UserTable"
+				ctx.Update()
+			}),
 		),
 		// Preview Area
 		app.Main().Class("preview").Body(
-			app.If(g.selectedComponent == "UserTable",
-				func() app.UI {
-					return &components.UserTable{
-						Users:       mockUsers,
-						CurrentPage: 1,
-						PageSize:    10,
-						TotalRows:   len(mockUsers),
-						SortBy:      "name",
-						SortOrder:   "asc",
-					}
-				},
-			).ElseIf(g.selectedComponent == "ApplicationBanner",
-				func() app.UI {
-					return components.NewApplicationBanner("Component Gallery")
-				},
-			).ElseIf(g.selectedComponent == "PageFooter",
-				func() app.UI {
-					return components.NewPageFooter("© 2024 Component Gallery")
-				},
-			// component_gallery.go - update the LoginForm section
-			).ElseIf(g.selectedComponent == "LoginForm",
-				func() app.UI {
-					// Create a mock login handler for the gallery
-					mockHandler := func(ctx app.Context, username, password string) (*models.User, error) {
-						if username == "demo" && password == "demo123" {
-							return &models.User{
-								Username: username,
-								Forename: "Gallery",
-								Surname:  "User",
-							}, nil
-						}
-						return nil, fmt.Errorf("Try: demo/demo123")
-					}
-					return components.NewLoginForm(mockHandler)
-				},
-			).ElseIf(g.selectedComponent == "RecentGophers",
-				func() app.UI {
-					return components.NewRecentGophers(mockRecentGophers)
-				},
-			).ElseIf(g.selectedComponent == "LabResults",
-				func() app.UI {
-					return components.NewLabResults(mockLabResults)
-				},
-			).ElseIf(g.selectedComponent == "LabResults-Loading",
-				func() app.UI {
-					return &components.LabResults{
-						LabResults: []models.LabResultItem{},
-						Loading:    true,
-					}
-				},
-			).ElseIf(g.selectedComponent == "LabResults-Nil",
-				func() app.UI {
-					return components.NewLabResults(nil)
-				},
-			).ElseIf(g.selectedComponent == "LabResults-Empty",
-				func() app.UI {
-					return &components.LabResults{
-						LabResults: []models.LabResultItem{},
-						Loading:    false,
-					}
-				},
-			),
+			g.renderSelectedComponent(),
 		),
 	)
+}
+
+
+
+
+
+// Then add this helper method:
+func (g *ComponentGallery) renderSelectedComponent() app.UI {
+    switch g.selectedComponent {        
+    case "Navbar":
+        navbar := &components.Navbar{}
+        navbar.Title = "My Navbar"
+        return navbar
+        
+    case "ApplicationBanner":
+        return components.NewApplicationBanner(
+            "Component Gallery",
+            g.mockQuickSearchHandler,
+            g.mockLogoutHandler,
+        )
+        
+    case "QuickSearch":
+        return components.NewQuickSearch(g.mockQuickSearchHandler)
+        
+    case "QuickSearch-Mock":
+        return components.NewQuickSearch(func(ctx app.Context, searchTerm string) error {
+            app.Log("Mock search for:", searchTerm)
+            return nil
+        })
+        
+    case "QuickSearch-Empty":
+        return components.NewQuickSearch(nil)
+        
+    case "PageFooter":
+        return components.NewPageFooter("© 2024 Component Gallery")
+        
+    case "LoginForm":
+        mockHandler := func(ctx app.Context, username, password string) (*models.User, error) {
+            if username == "demo" && password == "demo123" {
+                return &models.User{
+                    Username: username,
+                    Forename: "Gallery",
+                    Surname:  "User",
+                }, nil
+            }
+            return nil, fmt.Errorf("Try: demo/demo123")
+        }
+        return components.NewLoginForm(mockHandler)
+        
+    case "RecentGophers":
+        return components.NewRecentGophers(mockRecentGophers)
+        
+    case "LabResults":
+        return components.NewLabResults(mockLabResults)
+        
+    case "LabResults-Loading":
+        return &components.LabResults{
+            LabResults: []models.LabResultItem{},
+            Loading:    true,
+        }
+        
+    case "LabResults-Nil":
+        return components.NewLabResults(nil)
+        
+    case "LabResults-Empty":
+        return &components.LabResults{
+            LabResults: []models.LabResultItem{},
+            Loading:    false,
+        }
+        
+    case "UserTable":
+        return &components.UserTable{
+            Users:       mockUsers,
+            CurrentPage: 1,
+            PageSize:    10,
+            TotalRows:   len(mockUsers),
+            SortBy:      "name",
+            SortOrder:   "asc",
+        }
+
+    default:
+        return app.Div().Class("component-instructions").Body(
+            app.H2().Text("Component Gallery"),
+            app.P().Text("Select a component from the sidebar to preview it here."),
+            app.Ul().Body(
+                app.Li().Text("UserTable - Shows a table of users with pagination"),
+                app.Li().Text("Navbar - Basic navigation bar"),
+                app.Li().Text("ApplicationBanner - Header with quick search"),
+                app.Li().Text("QuickSearch - Patient ID search component"),
+                app.Li().Text("PageFooter - Footer component"),
+                app.Li().Text("LoginForm - Login form with validation"),
+                app.Li().Text("RecentGophers - Table of gopher data"),
+                app.Li().Text("LabResults - Medical lab results table"),
+            ),
+        )
+    }
 }
 
 // Define mock Users
