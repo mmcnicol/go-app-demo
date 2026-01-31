@@ -13,12 +13,12 @@ type BasePage struct {
 	app.Compo
 	navItemsGopherContext    []models.NavItem
 	navItemsNonGopherContext []models.NavItem
-	activeID                 string
-	expandedSecID            string
+	activeID                 string // Still used for content routing
 	user                     *models.User
 	gopherDemographics       *models.GopherDemographics
 	recentGophers            []models.RecentGopherItem
 	labResults               []models.LabResultItem
+	leftNavigation           *components.LeftNavigation // Single instance
 }
 
 func (b *BasePage) Render() app.UI {
@@ -57,10 +57,18 @@ func (b *BasePage) Render() app.UI {
 			}
 			b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
 			b.activeID = "RecentGophers"
-			b.expandedSecID = "GopherLists"
 			
 			app.Log("[BasePage Render] Non-gopher context, gopherDemographics is nil")
 			app.Log("[BasePage Render] Navigation items:", len(b.navItemsNonGopherContext))
+			
+			// Create or update left navigation
+			if b.leftNavigation == nil {
+				app.Log("[BasePage Render] Creating new LeftNavigation for non-gopher context")
+				b.leftNavigation = components.NewLeftNavigation(b.navItemsNonGopherContext)
+			} else {
+				app.Log("[BasePage Render] Updating existing LeftNavigation for non-gopher context")
+				b.leftNavigation.SetItems(b.Context(), b.navItemsNonGopherContext)
+			}
 			
 			return &components.PageLayout{
 				ApplicationBanner: components.NewApplicationBanner(
@@ -68,7 +76,7 @@ func (b *BasePage) Render() app.UI {
 					b.handleQuickSearch, // Quick search handler
 					b.handleLogout,      // Logout handler
 				),
-				LeftNavigation:    components.NewLeftNavigation(b.navItemsNonGopherContext, b.activeID, b.expandedSecID),
+				LeftNavigation:    b.leftNavigation, // Use the same instance
 				GopherBanner:      nil,
 				Body:              content,
 				PageFooter:        components.NewPageFooter("© 2024 Clinical Portal. All rights reserved."),
@@ -87,11 +95,21 @@ func (b *BasePage) Render() app.UI {
 			}
 			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 			b.activeID = "LabResults"
-			b.expandedSecID = "GopherRecords"
 			
 			app.Log("[BasePage Render] Gopher context, gopherDemographics exists")
 			app.Log("[BasePage Render] Navigation items (gopher context):", len(b.navItemsGopherContext))
-			app.Log("[BasePage Render] Active ID:", b.activeID, "Expanded Section ID:", b.expandedSecID)
+			app.Log("[BasePage Render] Active ID:", b.activeID)
+			
+			// Create or update left navigation
+			if b.leftNavigation == nil {
+				app.Log("[BasePage Render] Creating new LeftNavigation for gopher context")
+				b.leftNavigation = components.NewLeftNavigation(b.navItemsGopherContext)
+			} else {
+				app.Log("[BasePage Render] Updating existing LeftNavigation for gopher context")
+				b.leftNavigation.SetItems(b.Context(), b.navItemsGopherContext)
+				// Optionally set LabResults as active
+				b.leftNavigation.SetActiveItem(b.Context(), "LabResults")
+			}
 			
 			return &components.PageLayout{
 				ApplicationBanner: components.NewApplicationBanner(
@@ -99,7 +117,7 @@ func (b *BasePage) Render() app.UI {
 					b.handleQuickSearch, // Quick search handler
 					b.handleLogout,      // Logout handler
 				),
-				LeftNavigation:    components.NewLeftNavigation(b.navItemsGopherContext, b.activeID, b.expandedSecID),
+				LeftNavigation:    b.leftNavigation, // Use the same instance
 				GopherBanner:      components.NewGopherBanner(b.gopherDemographics),
 				Body:              content,
 				PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
@@ -171,23 +189,25 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 		newGopherDemographics := b.fetchGophersDemographics()
 		app.Log("[BasePage handleQuickSearch async] Fetched demographics:", newGopherDemographics)
 		
-		// CRITICAL: Update the navigation context
-		// We need to update the navigation items to gopher context
+		// Update the navigation context
 		ctx.Dispatch(func(ctx app.Context) {
 			app.Log("[BasePage handleQuickSearch dispatch] Updating state")
 			app.Log("[BasePage handleQuickSearch dispatch] Old gopherDemographics:", b.gopherDemographics)
 			app.Log("[BasePage handleQuickSearch dispatch] Old activeID:", b.activeID)
-			app.Log("[BasePage handleQuickSearch dispatch] Old expandedSecID:", b.expandedSecID)
 			
 			b.gopherDemographics = newGopherDemographics
 			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 			b.activeID = "LabResults" // Set default active item for gopher context
-			b.expandedSecID = "GopherRecords"
 			
 			app.Log("[BasePage handleQuickSearch dispatch] New gopherDemographics:", b.gopherDemographics)
 			app.Log("[BasePage handleQuickSearch dispatch] New activeID:", b.activeID)
-			app.Log("[BasePage handleQuickSearch dispatch] New expandedSecID:", b.expandedSecID)
 			app.Log("[BasePage handleQuickSearch dispatch] Navigation items updated to gopher context")
+			
+			// Update left navigation if it exists
+			if b.leftNavigation != nil {
+				b.leftNavigation.SetItems(ctx, b.navItemsGopherContext)
+				b.leftNavigation.SetActiveItem(ctx, "LabResults")
+			}
 		})
 		
 		app.Log("[BasePage] Found patient:", patientID)
@@ -207,6 +227,7 @@ func (b *BasePage) handleLogout(ctx app.Context) {
 	b.gopherDemographics = nil
 	b.recentGophers = nil
 	b.labResults = nil
+	b.leftNavigation = nil // Reset navigation instance
 	
 	// Trigger re-render
 	ctx.Update()
@@ -215,9 +236,7 @@ func (b *BasePage) handleLogout(ctx app.Context) {
 // OnMount is called when the component is first loaded
 func (b *BasePage) OnMount(ctx app.Context) {
 	app.Log("[BasePage OnMount] Initializing")
-	// We could check for existing session/cookie here
-	// For demo purposes, we'll start with no user logged in
-	//b.user = nil
+	
 	b.user = &models.User{
 		Username: "iamcheating",
 		Forename: "I'm",
@@ -228,7 +247,6 @@ func (b *BasePage) OnMount(ctx app.Context) {
 	b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
 	b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 	b.activeID = "RecentGophers"
-	b.expandedSecID = "GophersLists"
 	
 	app.Log("[BasePage OnMount] Navigation initialized")
 	app.Log("[BasePage OnMount] User set:", b.user)
@@ -242,7 +260,7 @@ func (b *BasePage) OnNav(ctx app.Context) {
 	// We could check for existing session/cookie here
 	// For demo purposes, we'll start with no user logged in
 	b.user = nil
-    //b.activeID = "RecentGophers"
+	b.leftNavigation = nil // Reset navigation instance
     ctx.Update()
 }
 
@@ -317,7 +335,7 @@ func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
 			ID:                "GopherLists",
 			Label:             "Gopher Lists",
 			Icon:              "fas fa-user-injured",
-			IsDefaultExpanded: true,
+			IsDefaultExpanded: true, // This section should be expanded by default
 			Route:             "",
 			Children: []models.NavItem{
 				{
@@ -360,7 +378,7 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 			ID:                "GopherLists",
 			Label:             "Gopher Lists",
 			Icon:              "fas fa-user-injured",
-			IsDefaultExpanded: false,
+			IsDefaultExpanded: false, // Not expanded by default in gopher context
 			Route:             "",
 			Children: []models.NavItem{
 				{
@@ -390,7 +408,7 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 			ID:                "GopherRecords",
 			Label:             "Gopher Records",
 			Icon:              "fas fa-user-injured",
-			IsDefaultExpanded: true,
+			IsDefaultExpanded: true, // This section should be expanded by default in gopher context
 			Route:             "",
 			Children: []models.NavItem{
 				{
