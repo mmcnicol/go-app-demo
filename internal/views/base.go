@@ -95,6 +95,7 @@ func (b *BasePage) Render() app.UI {
 	
 	// Check if user is nil (using pointer)
 	if b.User == nil {
+		app.Log("[BasePage Render] b.User is nil")
 		// Create login form with callback to BasePage's login method
 		loginForm := components.NewLoginForm(b.handleLogin)
 		return &components.PageLayout{
@@ -106,8 +107,11 @@ func (b *BasePage) Render() app.UI {
 		}
 
 	} else {
+		app.Log("[BasePage Render] b.User is NOT nil")
 		if b.GopherDemographics == nil {
+			app.Log("[BasePage Render] b.GopherDemographics is nil")
 			// Contextual Routing Logic
+			app.Log("[BasePage Render] b.ActiveID:", b.ActiveID)
 			switch b.ActiveID {
 			case "RecentGophers":
 				recentGophers := b.fetchRecentGophers()
@@ -134,7 +138,9 @@ func (b *BasePage) Render() app.UI {
 			}
 			
 		} else {
+			app.Log("[BasePage Render] b.GopherDemographics is NOT nil")
 			// Contextual Routing Logic
+			app.Log("[BasePage Render] b.ActiveID:", b.ActiveID)
 			switch b.ActiveID {
 			case "RecentGophers":
 				b.RecentGophers = b.fetchRecentGophers()
