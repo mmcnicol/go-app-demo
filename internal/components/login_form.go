@@ -78,11 +78,13 @@ func (l *LoginForm) Render() app.UI {
 
 func (l *LoginForm) onUsernameChange(ctx app.Context, e app.Event) {
 	l.Username = ctx.JSSrc().Get("value").String()
+	app.Log("[LoginForm onUsernameChange] l.Username:", l.Username)
 	ctx.Update()
 }
 
 func (l *LoginForm) onPasswordChange(ctx app.Context, e app.Event) {
 	l.Password = ctx.JSSrc().Get("value").String()
+	app.Log("[LoginForm onPasswordChange] l.Password:", l.Password)
 	ctx.Update()
 }
 
@@ -168,6 +170,8 @@ func (l *LoginForm) mockLogin(ctx app.Context) {
 }
 
 func (l *LoginForm) validate() error {
+	app.Log("[LoginForm validate] l.Username:", l.Username)
+	app.Log("[LoginForm validate] l.Password:", l.Password)
 	if l.Username == "" {
 		return fmt.Errorf("username is required")
 	}
