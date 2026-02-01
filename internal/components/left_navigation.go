@@ -42,7 +42,7 @@ func (n *LeftNavigation) OnMount(ctx app.Context) {
 }
 
 // Refresh updates the component
-func (n *GopherBanner) Refresh(ctx app.Context) {
+func (n *LeftNavigation) Refresh(ctx app.Context) {
 	ctx.Update()
 }
 
