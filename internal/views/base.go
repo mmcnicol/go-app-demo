@@ -11,16 +11,16 @@ import (
 
 type BasePage struct {
 	app.Compo
-	navItemsGopherContext    []models.NavItem
-	navItemsNonGopherContext []models.NavItem
+	//navItemsGopherContext    []models.NavItem
+	//navItemsNonGopherContext []models.NavItem
 	activeID                 string // Still used for content routing
-	user                     *models.User
-	gopherDemographics       *models.GopherDemographics
-	recentGophers            []models.RecentGopherItem
-	labResults               []models.LabResultItem
+	//user                     *models.User
+	//gopherDemographics       *models.GopherDemographics
+	//recentGophers            []models.RecentGopherItem
+	//labResults               []models.LabResultItem
 	
 	// Store navigation component instance
-	leftNavigation    *components.LeftNavigation
+	//leftNavigation    *components.LeftNavigation
 }
 
 func (b *BasePage) Render() app.UI {
@@ -33,6 +33,17 @@ func (b *BasePage) Render() app.UI {
 		Surname:  "User2",
 	}
 	
+	// a hack: should be based of user's roles & permissions
+	userSettings := &models.UserSettings{
+		defaultNavSectionNonGopherContext: "GopherLists",
+		defaultNavSectionGopherContext: "GopherRecords",
+		defaultNavItemNonGopherContext:  "RecentGophers",
+		defaultNavItemGopherContext:  "LabResults",
+	}
+	
+	ctx.SetState(state.UserObservable, user)
+	ctx.SetState(state.UserSettingsObservable, userSettings)
+
 	// Set the user on BasePage
 	b.user = user
 	
@@ -48,12 +59,14 @@ func (b *BasePage) Render() app.UI {
 			PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 		}
 	} else {
-		if b.gopherDemographics == nil {
+		var demographics *models.GopherDemographics
+    	ctx.ObserveState(state.GopherDemographicsObservable).Value(&demographics)
+		if demographics == nil {
 			// Contextual Routing Logic
 			switch b.activeID {
 			case "RecentGophers":
-				b.recentGophers = b.fetchRecentGophers()
-				content = components.NewRecentGophers(b.recentGophers)
+				recentGophers := b.fetchRecentGophers()
+				content = components.NewRecentGophers(recentGophers)
 			default:
 				content = &components.NotFoundComponent{}
 			}
@@ -121,7 +134,7 @@ func (b *BasePage) Render() app.UI {
 					b.handleLogout,      // Logout handler
 				),
 				LeftNavigation:    b.leftNavigation,
-				GopherBanner:      components.NewGopherBanner(b.gopherDemographics),
+				GopherBanner:      components.NewGopherBanner(demographics),
 				Body:              content,
 				PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 			}
@@ -146,13 +159,23 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 			Surname:  "User",
 		}
 		
-		// Set the user on BasePage
-		b.user = user
+		// a hack: should be based of user's roles & permissions
+		userSettings := &models.UserSettings{
+			defaultNavSectionNonGopherContext: "GopherLists",
+			defaultNavSectionGopherContext: "GopherRecords",
+			defaultNavItemNonGopherContext:  "RecentGophers",
+			defaultNavItemGopherContext:  "LabResults",
+		}
+
+		ctx.SetState(state.UserObservable, user)
+		ctx.SetState(state.UserSettingsObservable, userSettings)
+
+		ctx.SetState(state.GopherDemographicsObservable, nil)
 		
-		// Initialize other data
-		b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
-		b.navItemsGopherContext = b.fetchNavItemsGopherContext()
-		b.activeID = "RecentGophers"
+		ctx.SetState(state.NavItemsObservable, b.fetchNavItemsNonGopherContext())
+		
+		ctx.SetState(state.ExpandedSectionObservable, userSettings.defaultNavSectionNonGopherContext)
+		ctx.SetState(state.ActiveItemObservable, userSettings.defaultNavItemNonGopherContext)
 		
 		// Trigger a re-render
 		ctx.Update()
@@ -181,28 +204,31 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 	
 	// For demo, just show a message
 	ctx.Async(func() {
-		app.Log("[BasePage handleQuickSearch async] Starting search simulation")
+		//app.Log("[BasePage handleQuickSearch async] Starting search simulation")
 		
 		time.Sleep(1 * time.Second)
 		
 		newGopherDemographics := b.fetchGophersDemographics()
-		app.Log("[BasePage handleQuickSearch async] Fetched demographics:", newGopherDemographics)
+		//app.Log("[BasePage handleQuickSearch async] Fetched demographics:", newGopherDemographics)
 		
 		// Update the navigation context
 		ctx.Dispatch(func(ctx app.Context) {
-			app.Log("[BasePage handleQuickSearch dispatch] Updating state")
+			//app.Log("[BasePage handleQuickSearch dispatch] Updating state")
 			
-			b.gopherDemographics = newGopherDemographics
-			//b.navItemsGopherContext = b.fetchNavItemsGopherContext()
-			b.activeID = "LabResults" // Set default active item for gopher context
+			ctx.SetState(state.GopherDemographicsObservable, newGopherDemographics)
+		
+			ctx.SetState(state.NavItemsObservable, b.fetchNavItemsGopherContext())
+		
+			var userSettings *models.UserSettings
+			ctx.ObserveState(state.UserSettingsObservable).Value(&userSettings)
+
+			ctx.SetState(state.ExpandedSectionObservable, userSettings.defaultNavSectionGopherContext)
+			ctx.SetState(state.ActiveItemObservable, userSettings.defaultNavItemNonGopherContext)
 			
-			// Reset gopher navigation to get fresh state
-			b.leftNavigation = nil
-			
-			app.Log("[BasePage handleQuickSearch dispatch] Navigation reset for gopher context")
+			//app.Log("[BasePage handleQuickSearch dispatch] Navigation reset for gopher context")
 		})
 		
-		app.Log("[BasePage] Found patient:", patientID)
+		//app.Log("[BasePage] Found patient:", patientID)
 	})
 	
 	return nil
@@ -212,17 +238,16 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 func (b *BasePage) handleLogout(ctx app.Context) {
 	app.Log("[BasePage] Logging out user")
 	
-	// Clear user session
-	b.user = nil
+	ctx.SetState(state.UserObservable, nil)
+	ctx.SetState(state.UserSettingsObservable, nil)
+
+	ctx.SetState(state.GopherDemographicsObservable, nil)
 	
-	// Clear other state
-	b.gopherDemographics = nil
-	b.recentGophers = nil
-	b.labResults = nil
+	ctx.SetState(state.NavItemsObservable, nil)
 	
-	// Reset navigation component instance
-	b.leftNavigation = nil
-	
+	ctx.SetState(state.ExpandedSectionObservable, nil)
+	ctx.SetState(state.ActiveItemObservable, nil)
+
 	// Trigger re-render
 	ctx.Update()
 }
@@ -232,11 +257,24 @@ func (b *BasePage) handleLogout(ctx app.Context) {
 func (b *BasePage) OnMount(ctx app.Context) {
 	app.Log("[BasePage OnMount] Initializing")
 	
-	b.user = &models.User{
+	user := &models.User{
 		Username: "iamcheating",
 		Forename: "I'm",
 		Surname:  "Cheating",
 	}
+
+	// a hack: should be based of user's roles & permissions
+	userSettings := &models.UserSettings{
+		defaultNavSectionNonGopherContext: "GopherLists",
+		defaultNavSectionGopherContext: "GopherRecords",
+		defaultNavItemNonGopherContext:  "RecentGophers",
+		defaultNavItemGopherContext:  "LabResults",
+	}
+	
+	ctx.SetState(state.UserObservable, user)
+	ctx.SetState(state.UserSettingsObservable, userSettings)
+
+	b.user = user
 
 	// Initialize navigation items
 	b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
@@ -258,7 +296,17 @@ func (b *BasePage) OnNav(ctx app.Context) {
 	app.Log("[BasePage OnNav] Navigation event")
 	// We could check for existing session/cookie here
 	// For demo purposes, we'll start with no user logged in
-	b.user = nil
+
+	ctx.SetState(state.UserObservable, nil)
+	ctx.SetState(state.UserSettingsObservable, nil)
+
+	ctx.SetState(state.GopherDemographicsObservable, nil)
+	
+	ctx.SetState(state.NavItemsObservable, nil)
+	
+	ctx.SetState(state.ExpandedSectionObservable, nil)
+	ctx.SetState(state.ActiveItemObservable, nil)
+
     ctx.Update()
 }
 
@@ -326,29 +374,24 @@ func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
 			ID:        "MySettings",
 			Label:     "My Settings",
 			Icon:      "fas fa-cog",
-			IsLoading: false,
 			Route:     "/settings",
 		},
 		{
 			ID:                "GopherLists",
 			Label:             "Gopher Lists",
 			Icon:              "fas fa-user-injured",
-			IsDefaultExpanded: true, // This section should be expanded by default
 			Route:             "",
 			Children: []models.NavItem{
 				{
 					ID:        "RecentGophers",
 					Label:     "Recent Gophers",
 					Icon:      "fas fa-list",
-					IsDefaultSelected: true,
-					IsLoading: false,
 					Route:     "/recent-gophers",
 				},
 				{
 					ID:        "PharmacyDischargeList",
 					Label:     "Pharmacy Discharge List",
 					Icon:      "fas fa-plus-circle",
-					IsLoading: false,
 					Route:     "/pharmacy-discharge",
 				},
 			},
@@ -357,7 +400,6 @@ func (b *BasePage) fetchNavItemsNonGopherContext() []models.NavItem {
 			ID:        "GopherSearch",
 			Label:     "Gopher Search",
 			Icon:      "fas fa-search",
-			IsLoading: false,
 			Route:     "/search",
 		},
 	}
@@ -370,28 +412,24 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 			ID:        "MySettings",
 			Label:     "My Settings",
 			Icon:      "fas fa-cog",
-			IsLoading: false,
 			Route:     "/settings",
 		},
 		{
 			ID:                "GopherLists",
 			Label:             "Gopher Lists",
 			Icon:              "fas fa-user-injured",
-			IsDefaultExpanded: false, // Not expanded by default in gopher context
 			Route:             "",
 			Children: []models.NavItem{
 				{
 					ID:        "RecentGophers",
 					Label:     "Recent Gophers",
 					Icon:      "fas fa-list",
-					IsLoading: false,
 					Route:     "/recent-gophers",
 				},
 				{
 					ID:        "PharmacyDischargeList",
 					Label:     "Pharmacy Discharge List",
 					Icon:      "fas fa-plus-circle",
-					IsLoading: false,
 					Route:     "/pharmacy-discharge",
 				},
 			},
@@ -400,22 +438,18 @@ func (b *BasePage) fetchNavItemsGopherContext() []models.NavItem {
 			ID:        "GopherSearch",
 			Label:     "Gopher Search",
 			Icon:      "fas fa-search",
-			IsLoading: false,
 			Route:     "/search",
 		},
 		{
 			ID:                "GopherRecords",
 			Label:             "Gopher Records",
 			Icon:              "fas fa-user-injured",
-			IsDefaultExpanded: true, // This section should be expanded by default in gopher context
 			Route:             "",
 			Children: []models.NavItem{
 				{
 					ID:        "LabResults",
 					Label:     "Lab Results",
 					Icon:      "fas fa-list",
-					IsDefaultSelected: true,
-					IsLoading: false,
 					Route:     "/lab-results",
 				},
 			},

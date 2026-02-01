@@ -9,28 +9,37 @@ import (
 
 type GopherBanner struct {
 	app.Compo
-	GopherDemographics *models.GopherDemographics
+	//GopherDemographics *models.GopherDemographics
 }
 
+/*
 func NewGopherBanner(demographics *models.GopherDemographics) *GopherBanner {
 	return &GopherBanner{
 		GopherDemographics: demographics,
 	}
 }
+*/
+
+func NewGopherBanner() *GopherBanner {
+	return &GopherBanner{}
+}
 
 func (gb *GopherBanner) Render() app.UI {
 
-	if gb.GopherDemographics == nil {
+	var demographics *models.GopherDemographics
+    ctx.ObserveState(state.GopherDemographicsObservable).Value(&demographics)
+
+	if demographics == nil {
 		return app.Div().Class("demographics-bar").Body(
 			app.Span().Text("No Gopher Selected"),
 		)
 	}
 
-	dobFormatted := gb.GopherDemographics.DateOfBirth.Format("02/01/2006")
-	age := int(time.Since(gb.GopherDemographics.DateOfBirth).Hours() / 24 / 365)
+	dobFormatted := demographics.DateOfBirth.Format("02/01/2006")
+	age := int(time.Since(demographics.DateOfBirth).Hours() / 24 / 365)
 
 	return app.Div().Class("demographics-bar").Body(
-		app.Span().Text(gb.GopherDemographics.Name),
+		app.Span().Text(demographics.Name),
 		app.Span().Text("DOB: "),
 		app.Span().Text(dobFormatted),
 		app.Span().Text(fmt.Sprintf(" (%d years old)", age)),
