@@ -14,12 +14,3 @@ const (
     ExpandedSectionKey    = "expandedSection"
     ActiveItemKey         = "activeNavItem"
 )
-
-var (
-	UserObservable = app.Observable{ Name: UserKey }
-	UserSettingsObservable = app.Observable{ Name: UserSettingsKey }
-	GopherDemographicsObservable = app.Observable{ Name: GopherDemographicsKey }
-	NavItemsObservable = app.Observable{ Name: NavItemsKey }
-    ExpandedSectionObservable = app.Observable{ Name: ExpandedSectionKey }
-	ActiveItemObservable = app.Observable{ Name: ActiveItemKey }
-)
