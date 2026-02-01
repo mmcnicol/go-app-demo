@@ -28,12 +28,6 @@ type BasePage struct {
 // OnMount is called when the component is first loaded
 func (b *BasePage) OnMount(ctx app.Context) {
 	app.Log("[BasePage OnMount] Initializing")
-	
-	ctx.ObserveState(state.UserKey, &b.User).
-		OnChange(func() {
-			app.Log("[BasePage] User changed")
-			b.Refresh(ctx)
-		})
 
 	user := &models.User{
 		Username: "iamcheating",
@@ -54,17 +48,17 @@ func (b *BasePage) OnMount(ctx app.Context) {
 
 	b.User = user
 
-	// Initialize navigation items
-	//b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
-	//b.navItemsGopherContext = b.fetchNavItemsGopherContext()
-	b.activeID = "RecentGophers"
+	ctx.ObserveState(state.UserKey, &b.User).
+		OnChange(func() {
+			app.Log("[BasePage] User changed")
+			b.Refresh(ctx)
+		})
+		
 	// Create gopher navigation instance
 	if b.leftNavigation == nil {
 		app.Log("[BasePage Render] Creating new gopher navigation")
-		b.leftNavigation = components.NewLeftNavigation(b.navItemsNonGopherContext)
+		b.leftNavigation = components.NewLeftNavigation()
 	}
-	app.Log("[BasePage OnMount] leftNavigation initialized")
-	app.Log("[BasePage OnMount] User set:", b.user)
 	
 	b.isMounted = true
 	b.Refresh(ctx)
