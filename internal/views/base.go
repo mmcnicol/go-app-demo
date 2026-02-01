@@ -30,6 +30,7 @@ type BasePage struct {
 func (b *BasePage) OnMount(ctx app.Context) {
 	app.Log("[BasePage OnMount] Initializing")
 
+	/*
 	user := &models.User{
 		Username: "iamcheating",
 		Forename: "I'm",
@@ -48,7 +49,8 @@ func (b *BasePage) OnMount(ctx app.Context) {
 	ctx.SetState(state.UserSettingsKey, userSettings)
 
 	b.User = user
-
+	*/
+	
 	ctx.ObserveState(state.UserKey, &b.User).
 		OnChange(func() {
 			app.Log("[BasePage] User changed")
@@ -303,7 +305,7 @@ func (b *BasePage) OnNav(ctx app.Context) {
 	ctx.SetState(state.ExpandedSectionKey, nil)
 	ctx.SetState(state.ActiveItemKey, nil)
 	*/
-	
+
     ctx.Update()
 }
 
