@@ -29,7 +29,7 @@ type BasePage struct {
 func (b *BasePage) OnMount(ctx app.Context) {
 	app.Log("[BasePage OnMount] Initializing")
 	
-	ctx.ObserveState(state.UserKey, &b.User changed").
+	ctx.ObserveState(state.UserKey, &b.User).
 		OnChange(func() {
 			app.Log("[BasePage] User changed")
 			b.Refresh(ctx)
