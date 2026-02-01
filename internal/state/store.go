@@ -5,9 +5,6 @@ import (
     //"go-app-demo/internal/models"
 )
 
-// internal/state/store.go
-package state
-
 // State keys (observable identifiers)
 const (
     UserKey               = "user"
