@@ -17,8 +17,8 @@ type BasePage struct {
 	ActiveID                 string // Still used for content routing
 	User                     *models.User
 	GopherDemographics       *models.GopherDemographics
-	//recentGophers            []models.RecentGopherItem
-	//labResults               []models.LabResultItem
+	RecentGophers            []models.RecentGopherItem
+	LabResults               []models.LabResultItem
 	
 	// Store navigation component instance
 	LeftNavigation    *components.LeftNavigation
@@ -65,9 +65,9 @@ func (b *BasePage) OnMount(ctx app.Context) {
 		})
 
 	// Create gopher navigation instance
-	if b.leftNavigation == nil {
-		app.Log("[BasePage Render] Creating new gopher navigation")
-		b.leftNavigation = components.NewLeftNavigation()
+	if b.LeftNavigation == nil {
+		app.Log("[BasePage Render] Creating new left navigation")
+		b.LeftNavigation = components.NewLeftNavigation()
 	}
 	
 	b.isMounted = true
@@ -107,7 +107,7 @@ func (b *BasePage) Render() app.UI {
 	} else {
 		if b.GopherDemographics == nil {
 			// Contextual Routing Logic
-			switch b.activeID {
+			switch b.ActiveID {
 			case "RecentGophers":
 				recentGophers := b.fetchRecentGophers()
 				content = components.NewRecentGophers(recentGophers)
