@@ -171,15 +171,19 @@ func (b *BasePage) Render() app.UI {
 
 // handleLogin is the callback function passed to LoginForm
 func (b *BasePage) handleLogin(ctx app.Context, username string, password string) (*models.User, error) {
+	app.Log("[BasePage handleLogin] ")
+	
 	// This is where you would integrate with your authentication system
 	// For now, we'll use a simple mock
 	
 	if username == "" || password == "" {
+		app.Log("[BasePage handleLogin] username and password are required")
 		return nil, fmt.Errorf("username and password are required")
 	}
-	
+	app.Log("[BasePage handleLogin] username and password are populated")
 	// Simple mock authentication
 	if username == "demo" && password == "demo123" {
+		app.Log("[BasePage handleLogin] username and password are VALID")
 		user := &models.User{
 			Username: username,
 			Forename: "Demo",
@@ -205,11 +209,13 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 		ctx.SetState(state.ActiveItemKey, userSettings.DefaultNavItemNonGopherContext)
 		
 		b.User = user
-		
+
 		// Trigger a re-render
 		ctx.Update()
 		
 		return user, nil
+	} else {
+		app.Log("[BasePage handleLogin] username and password are NOT VALID")
 	}
 	
 	return nil, fmt.Errorf("invalid credentials")
