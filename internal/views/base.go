@@ -136,30 +136,16 @@ func (b *BasePage) Render() app.UI {
 			// Contextual Routing Logic
 			switch b.ActiveID {
 			case "RecentGophers":
-				b.recentGophers = b.fetchRecentGophers()
-				content = components.NewRecentGophers(b.recentGophers)
+				b.RecentGophers = b.fetchRecentGophers()
+				content = components.NewRecentGophers(b.RecentGophers)
 			case "LabResults":
-				b.labResults = b.fetchLabResults()
-				content = components.NewLabResults(b.labResults)
+				b.LabResults = b.fetchLabResults()
+				content = components.NewLabResults(b.LabResults)
 			default:
 				content = &components.NotFoundComponent{}
 			}
-			b.navItemsGopherContext = b.fetchNavItemsGopherContext()
-			b.activeID = "LabResults"
-			
-			app.Log("[BasePage Render] Gopher context, gopherDemographics exists")
-			app.Log("[BasePage Render] Navigation items (gopher context):", len(b.navItemsGopherContext))
-			app.Log("[BasePage Render] Active ID:", b.activeID)
-			
-			// Create or reuse gopher navigation
-			if b.leftNavigation == nil {
-				app.Log("[BasePage Render] Creating new gopher navigation")
-				b.leftNavigation = components.NewLeftNavigation(b.navItemsGopherContext)
-			} else {
-				app.Log("[BasePage Render] Reusing gopher navigation")
-				// Update items if needed
-				b.leftNavigation.SetItems(b.navItemsGopherContext)
-			}
+			//b.navItemsGopherContext = b.fetchNavItemsGopherContext()
+			//b.activeID = "LabResults"
 
 			return &components.PageLayout{
 				ApplicationBanner: components.NewApplicationBanner(
@@ -167,8 +153,8 @@ func (b *BasePage) Render() app.UI {
 					b.handleQuickSearch, // Quick search handler
 					b.handleLogout,      // Logout handler
 				),
-				LeftNavigation:    b.leftNavigation,
-				GopherBanner:      components.NewGopherBanner(demographics),
+				LeftNavigation:    b.LeftNavigation,
+				GopherBanner:      components.NewGopherBanner(b.GopherDemographics),
 				Body:              content,
 				PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 			}
