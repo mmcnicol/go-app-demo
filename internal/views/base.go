@@ -16,12 +16,12 @@ type BasePage struct {
 	//navItemsNonGopherContext []models.NavItem
 	ActiveID                 string // Still used for content routing
 	User                     *models.User
-	//gopherDemographics       *models.GopherDemographics
+	GopherDemographics       *models.GopherDemographics
 	//recentGophers            []models.RecentGopherItem
 	//labResults               []models.LabResultItem
 	
 	// Store navigation component instance
-	//leftNavigation    *components.LeftNavigation
+	LeftNavigation    *components.LeftNavigation
 	isMounted     bool // Managed internally
 }
 
@@ -53,7 +53,17 @@ func (b *BasePage) OnMount(ctx app.Context) {
 			app.Log("[BasePage] User changed")
 			b.Refresh(ctx)
 		})
-		
+	ctx.ObserveState(state.GopherDemographicsKey, &b.GopherDemographics).
+		OnChange(func() {
+			app.Log("[BasePage] Gopher Demographics changed")
+			b.Refresh(ctx)
+		})
+	ctx.ObserveState(state.ActiveItemKey, &b.ActiveID).
+		OnChange(func() {
+			app.Log("[BasePage] Active Item changed")
+			b.Refresh(ctx)
+		})
+
 	// Create gopher navigation instance
 	if b.leftNavigation == nil {
 		app.Log("[BasePage Render] Creating new gopher navigation")
@@ -83,7 +93,7 @@ func (b *BasePage) Render() app.UI {
     var content app.UI
 	
 	// Check if user is nil (using pointer)
-	if b.user == nil {
+	if b.User == nil {
 		// Create login form with callback to BasePage's login method
 		loginForm := components.NewLoginForm(b.handleLogin)
 		return &components.PageLayout{
@@ -93,10 +103,9 @@ func (b *BasePage) Render() app.UI {
 			Body:              loginForm,
 			PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 		}
+
 	} else {
-		var demographics *models.GopherDemographics
-    	ctx.ObserveState(state.GopherDemographicsObservable).Value(&demographics)
-		if demographics == nil {
+		if b.GopherDemographics == nil {
 			// Contextual Routing Logic
 			switch b.activeID {
 			case "RecentGophers":
@@ -105,21 +114,11 @@ func (b *BasePage) Render() app.UI {
 			default:
 				content = &components.NotFoundComponent{}
 			}
-			b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
-			b.activeID = "RecentGophers"
+			//b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
+			//b.activeID = "RecentGophers"
 			
-			app.Log("[BasePage Render] Non-gopher context, gopherDemographics is nil")
-			app.Log("[BasePage Render] Navigation items:", len(b.navItemsNonGopherContext))
-			
-			// Create or reuse non-gopher navigation
-			if b.leftNavigation == nil {
-				app.Log("[BasePage Render] Creating new non-gopher navigation")
-				b.leftNavigation = components.NewLeftNavigation(b.navItemsNonGopherContext)
-			} else {
-				app.Log("[BasePage Render] Reusing non-gopher navigation")
-				// Update items if needed
-				b.leftNavigation.SetItems(b.navItemsNonGopherContext)
-			}
+			//app.Log("[BasePage Render] Non-gopher context, gopherDemographics is nil")
+			//app.Log("[BasePage Render] Navigation items:", len(b.navItemsNonGopherContext))
 
 			return &components.PageLayout{
 				ApplicationBanner: components.NewApplicationBanner(
@@ -127,7 +126,7 @@ func (b *BasePage) Render() app.UI {
 					b.handleQuickSearch, // Quick search handler
 					b.handleLogout,      // Logout handler
 				),
-				LeftNavigation:    b.leftNavigation,
+				LeftNavigation:    b.LeftNavigation,
 				GopherBanner:      nil,
 				Body:              content,
 				PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
@@ -135,7 +134,7 @@ func (b *BasePage) Render() app.UI {
 			
 		} else {
 			// Contextual Routing Logic
-			switch b.activeID {
+			switch b.ActiveID {
 			case "RecentGophers":
 				b.recentGophers = b.fetchRecentGophers()
 				content = components.NewRecentGophers(b.recentGophers)
