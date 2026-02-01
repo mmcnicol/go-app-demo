@@ -8,4 +8,6 @@ const (
     NavItemsKey           = "navItems"
     ExpandedSectionKey    = "expandedSection"
     ActiveItemKey         = "activeNavItem"
+    UsernameKey         = "username"
+    PasswordKey         = "password"
 )

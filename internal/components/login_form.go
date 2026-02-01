@@ -1,4 +1,3 @@
-// login_form.go
 package components
 
 import (
@@ -7,6 +6,7 @@ import (
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"go-app-demo/internal/models"
+	"go-app-demo/internal/state"
 )
 
 // LoginHandler defines the signature for login callback functions
@@ -79,12 +79,14 @@ func (l *LoginForm) Render() app.UI {
 func (l *LoginForm) onUsernameChange(ctx app.Context, e app.Event) {
 	l.Username = ctx.JSSrc().Get("value").String()
 	app.Log("[LoginForm onUsernameChange] l.Username:", l.Username)
+	ctx.SetState(state.UsernameKey, l.Username)
 	//ctx.Update()
 }
 
 func (l *LoginForm) onPasswordChange(ctx app.Context, e app.Event) {
 	l.Password = ctx.JSSrc().Get("value").String()
 	app.Log("[LoginForm onPasswordChange] l.Password:", l.Password)
+	ctx.SetState(state.PasswordKey, l.Password)
 	//ctx.Update()
 }
 
@@ -170,6 +172,8 @@ func (l *LoginForm) mockLogin(ctx app.Context) {
 }
 
 func (l *LoginForm) validate() error {
+	ctx.GetState(UsernameKey, &l.Username)
+	ctx.GetState(PasswordKey, &l.Password)
 	app.Log("[LoginForm validate] l.Username:", l.Username)
 	app.Log("[LoginForm validate] l.Password:", l.Password)
 	if l.Username == "" {
