@@ -204,6 +204,8 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 		ctx.SetState(state.ExpandedSectionKey, userSettings.DefaultNavSectionNonGopherContext)
 		ctx.SetState(state.ActiveItemKey, userSettings.DefaultNavItemNonGopherContext)
 		
+		b.User = user
+		
 		// Trigger a re-render
 		ctx.Update()
 		
