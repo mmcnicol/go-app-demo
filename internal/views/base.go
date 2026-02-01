@@ -16,6 +16,7 @@ type BasePage struct {
 	//navItemsNonGopherContext []models.NavItem
 	ActiveID                 string // Still used for content routing
 	User                     *models.User
+	UserSettings             *models.UserSettings
 	GopherDemographics       *models.GopherDemographics
 	RecentGophers            []models.RecentGopherItem
 	LabResults               []models.LabResultItem
@@ -154,7 +155,7 @@ func (b *BasePage) Render() app.UI {
 					b.handleLogout,      // Logout handler
 				),
 				LeftNavigation:    b.LeftNavigation,
-				GopherBanner:      components.NewGopherBanner(b.GopherDemographics),
+				GopherBanner:      components.NewGopherBanner(),
 				Body:              content,
 				PageFooter:        components.NewPageFooter("© 2026 Clinical Portal. All rights reserved."),
 			}
@@ -187,15 +188,15 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 			DefaultNavItemGopherContext:  "LabResults",
 		}
 
-		ctx.SetState(state.UserObservable, user)
-		ctx.SetState(state.UserSettingsObservable, userSettings)
+		ctx.SetState(state.UserKey, user)
+		ctx.SetState(state.UserSettingsKey, userSettings)
 
-		ctx.SetState(state.GopherDemographicsObservable, nil)
+		ctx.SetState(state.GopherDemographicsKey, nil)
 		
-		ctx.SetState(state.NavItemsObservable, b.fetchNavItemsNonGopherContext())
+		ctx.SetState(state.NavItemsKey, b.fetchNavItemsNonGopherContext())
 		
-		ctx.SetState(state.ExpandedSectionObservable, userSettings.defaultNavSectionNonGopherContext)
-		ctx.SetState(state.ActiveItemObservable, userSettings.defaultNavItemNonGopherContext)
+		ctx.SetState(state.ExpandedSectionKey, userSettings.defaultNavSectionNonGopherContext)
+		ctx.SetState(state.ActiveItemKey, userSettings.defaultNavItemNonGopherContext)
 		
 		// Trigger a re-render
 		ctx.Update()
@@ -235,15 +236,14 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 		ctx.Dispatch(func(ctx app.Context) {
 			//app.Log("[BasePage handleQuickSearch dispatch] Updating state")
 			
-			ctx.SetState(state.GopherDemographicsObservable, newGopherDemographics)
+			ctx.SetState(state.GopherDemographicsKey, newGopherDemographics)
 		
-			ctx.SetState(state.NavItemsObservable, b.fetchNavItemsGopherContext())
+			ctx.SetState(state.NavItemsKey, b.fetchNavItemsGopherContext())
 		
-			var userSettings *models.UserSettings
-			ctx.ObserveState(state.UserSettingsObservable).Value(&userSettings)
+			ctx.ObserveState(state.UserSettingsObservable).Value(b.UserSettings)
 
-			ctx.SetState(state.ExpandedSectionObservable, userSettings.defaultNavSectionGopherContext)
-			ctx.SetState(state.ActiveItemObservable, userSettings.defaultNavItemNonGopherContext)
+			ctx.SetState(state.ExpandedSectionObservable, b.UserSettings.defaultNavSectionGopherContext)
+			ctx.SetState(state.ActiveItemObservable, b.UserSettings.defaultNavItemNonGopherContext)
 			
 			//app.Log("[BasePage handleQuickSearch dispatch] Navigation reset for gopher context")
 		})
