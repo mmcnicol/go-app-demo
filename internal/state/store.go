@@ -1,10 +1,5 @@
 package state
 
-import (
-    "github.com/maxence-charriere/go-app/v10/pkg/app"
-    //"go-app-demo/internal/models"
-)
-
 // State keys (observable identifiers)
 const (
     UserKey               = "user"
