@@ -7,33 +7,35 @@ import (
 
 type LeftNavigation struct {
 	app.Compo
-	//Items         []models.NavItem
-	//ActiveItemID  string // Managed internally
-	//ExpandedSecID string // Managed internally
+	Items         []models.NavItem
+	ActiveItemID  string
+	ExpandedSecID string
 	isMounted     bool // Managed internally
+	ctx app.Context
 }
-
-/*
-// NewLeftNavigation creates a new LeftNavigation component
-func NewLeftNavigation(items []models.NavItem) *LeftNavigation {
-	app.Log("[LeftNavigation New] Creating with", len(items), "items")
-	
-	nav := &LeftNavigation{
-		Items: items,
-	}
-
-	// Initialize state immediately in constructor, not in OnMount
-	//nav.initializeState()
-	
-	return nav
-}
-*/
 
 func NewLeftNavigation() *LeftNavigation {
 	return &LeftNavigation{}
 }
 
 func (n *LeftNavigation) OnMount(ctx app.Context) {
+	n.ctx = ctx
+	
+	// Subscribe to all relevant state
+	ctx.ObserveState(state.NavItemsObservable).Value(&n.Items)
+	ctx.ObserveState(state.ExpandedSectionObservable).Value(&n.ExpandedSecID)
+	ctx.ObserveState(state.ActiveItemObservable).Value(&n.ActiveItemID)
+
+	// Update component when state changes
+    ctx.ObserveState(state.NavItemsObservable).OnChange(ctx.Update)
+	ctx.ObserveState(state.ExpandedSectionObservable).OnChange(ctx.Update)
+	ctx.ObserveState(state.ActiveItemObservable).OnChange(ctx.Update)
+
+	// Read state
+	ctx.ObserveState(state.NavItemsObservable).Value(&n.Items)
+	ctx.ObserveState(state.ExpandedSectionObservable).Value(&n.ExpandedSecID)
+	ctx.ObserveState(state.ActiveItemObservable).Value(&n.ActiveItemID)
+
 	n.isMounted = true
 }
 
@@ -47,13 +49,15 @@ func (n *LeftNavigation) Render() app.UI {
 		return app.Div().Class("nav-sidebar loading")
 	}
 
+	/*
 	var items *[]models.NavItem
     ctx.ObserveState(state.GopherDemographicsObservable).Value(&items)
-	
+	*/
+
 	return app.Nav().Class("nav-sidebar").Body(
 		app.Ul().Class("nav-list").Body(
-			app.Range(items).Slice(func(i int) app.UI {
-				return n.renderItem(items[i])
+			app.Range(n.Items).Slice(func(i int) app.UI {
+				return n.renderItem(n.Items[i])
 			}),
 		),
 	)
@@ -64,13 +68,15 @@ func (n *LeftNavigation) renderItem(item models.NavItem) app.UI {
 
 	hasChildren := len(item.Children) > 0
 	
+	/*
 	var expandedSecID string
 	var activeItemID string
     ctx.ObserveState(state.ExpandedSectionObservable).Value(&expandedSecID)
 	ctx.ObserveState(state.ActiveItemObservable).Value(&activeItemID)
-	
-	isExpanded := expandedSecID == item.ID
-	isSelected := activeItemID == item.ID
+	*/
+
+	isExpanded := n.ExpandedSecID == item.ID
+	isSelected := n.ActiveItemID == item.ID
 	
 	// Build conditional class string
 	itemClass := "nav-item"
