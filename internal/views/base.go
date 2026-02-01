@@ -49,10 +49,10 @@ func (b *BasePage) OnMount(ctx app.Context) {
 		DefaultNavItemGopherContext:  "LabResults",
 	}
 	
-	ctx.SetState(state.UserObservable, user)
-	ctx.SetState(state.UserSettingsObservable, userSettings)
+	ctx.SetState(state.UserKey, user)
+	ctx.SetState(state.UserSettingsKey, userSettings)
 
-	//b.user = user
+	b.User = user
 
 	// Initialize navigation items
 	//b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
@@ -71,7 +71,7 @@ func (b *BasePage) OnMount(ctx app.Context) {
 }
 
 // Refresh updates the component
-func (b *LeftNavigation) Refresh(ctx app.Context) {
+func (b *BasePage) Refresh(ctx app.Context) {
 	ctx.Update()
 }
 
