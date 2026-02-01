@@ -195,8 +195,8 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 		
 		ctx.SetState(state.NavItemsKey, b.fetchNavItemsNonGopherContext())
 		
-		ctx.SetState(state.ExpandedSectionKey, userSettings.defaultNavSectionNonGopherContext)
-		ctx.SetState(state.ActiveItemKey, userSettings.defaultNavItemNonGopherContext)
+		ctx.SetState(state.ExpandedSectionKey, userSettings.DefaultNavSectionNonGopherContext)
+		ctx.SetState(state.ActiveItemKey, userSettings.DefaultNavItemNonGopherContext)
 		
 		// Trigger a re-render
 		ctx.Update()
@@ -240,10 +240,10 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 		
 			ctx.SetState(state.NavItemsKey, b.fetchNavItemsGopherContext())
 		
-			ctx.ObserveState(state.UserSettingsObservable).Value(b.UserSettings)
+			//ctx.ObserveState(state.UserSettingsObservable).Value(b.UserSettings)
 
-			ctx.SetState(state.ExpandedSectionObservable, b.UserSettings.defaultNavSectionGopherContext)
-			ctx.SetState(state.ActiveItemObservable, b.UserSettings.defaultNavItemNonGopherContext)
+			ctx.SetState(state.ExpandedSectionKey, b.UserSettings.DefaultNavSectionGopherContext)
+			ctx.SetState(state.ActiveItemKey, b.UserSettings.DefaultNavItemNonGopherContext)
 			
 			//app.Log("[BasePage handleQuickSearch dispatch] Navigation reset for gopher context")
 		})
