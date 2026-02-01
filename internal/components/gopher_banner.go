@@ -11,7 +11,7 @@ import (
 type GopherBanner struct {
 	app.Compo
 	GopherDemographics *models.GopherDemographics
-	isMounted     bool // Managed internally
+	isMounted          bool // Managed internally
 	ctx app.Context
 }
 
@@ -31,13 +31,13 @@ func (gb *GopherBanner) OnMount(ctx app.Context) {
 	gb.ctx = ctx
 
 	// Subscribe to all relevant state
-	ctx.ObserveState(state.GopherDemographicsObservable).Value(&gb.GopherDemographics)
+	ctx.ObserveState(state.GopherDemographicsKey).Value(&gb.GopherDemographics)
 
 	// Update component when state changes
-    ctx.ObserveState(state.GopherDemographicsObservable).OnChange(ctx.Update)
+    ctx.ObserveState(state.GopherDemographicsKey).OnChange(ctx.Update)
 
 	// Read state
-	ctx.ObserveState(state.GopherDemographicsObservable).Value(&gb.GopherDemographics)
+	ctx.ObserveState(state.GopherDemographicsKey).Value(&gb.GopherDemographics)
 
 	gb.isMounted = true
 }

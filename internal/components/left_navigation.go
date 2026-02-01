@@ -23,19 +23,19 @@ func (n *LeftNavigation) OnMount(ctx app.Context) {
 	n.ctx = ctx
 	
 	// Subscribe to all relevant state
-	ctx.ObserveState(state.NavItemsObservable).Value(&n.Items)
-	ctx.ObserveState(state.ExpandedSectionObservable).Value(&n.ExpandedSecID)
-	ctx.ObserveState(state.ActiveItemObservable).Value(&n.ActiveItemID)
+	ctx.ObserveState(state.NavItemsKey).Value(&n.Items)
+	ctx.ObserveState(state.ExpandedSectionKey).Value(&n.ExpandedSecID)
+	ctx.ObserveState(state.ActiveItemKey).Value(&n.ActiveItemID)
 
 	// Update component when state changes
-    ctx.ObserveState(state.NavItemsObservable).OnChange(ctx.Update)
-	ctx.ObserveState(state.ExpandedSectionObservable).OnChange(ctx.Update)
-	ctx.ObserveState(state.ActiveItemObservable).OnChange(ctx.Update)
+    ctx.ObserveState(state.NavItemsKey).OnChange(ctx.Update)
+	ctx.ObserveState(state.ExpandedSectionKey).OnChange(ctx.Update)
+	ctx.ObserveState(state.ActiveItemKey).OnChange(ctx.Update)
 
 	// Read state
-	ctx.ObserveState(state.NavItemsObservable).Value(&n.Items)
-	ctx.ObserveState(state.ExpandedSectionObservable).Value(&n.ExpandedSecID)
-	ctx.ObserveState(state.ActiveItemObservable).Value(&n.ActiveItemID)
+	ctx.ObserveState(state.NavItemsKey).Value(&n.Items)
+	ctx.ObserveState(state.ExpandedSectionKey).Value(&n.ExpandedSecID)
+	ctx.ObserveState(state.ActiveItemKey).Value(&n.ActiveItemID)
 
 	n.isMounted = true
 }
