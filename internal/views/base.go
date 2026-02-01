@@ -457,6 +457,6 @@ func (b *BasePage) Login(username, password string) bool {
 
 // Logout method
 func (b *BasePage) Logout() {
-    b.user = nil
+    b.User = nil
     //ctx.Update()
 }
