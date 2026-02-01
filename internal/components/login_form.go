@@ -94,6 +94,9 @@ func (l *LoginForm) OnSubmit(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 	app.Log("[LoginForm OnSubmit] ")
 
+	ctx.GetState(UsernameKey, &l.Username)
+	ctx.GetState(PasswordKey, &l.Password)
+	
 	// Validate inputs
 	err := l.validate()
 	if err != nil {
@@ -172,8 +175,6 @@ func (l *LoginForm) mockLogin(ctx app.Context) {
 }
 
 func (l *LoginForm) validate() error {
-	ctx.GetState(UsernameKey, &l.Username)
-	ctx.GetState(PasswordKey, &l.Password)
 	app.Log("[LoginForm validate] l.Username:", l.Username)
 	app.Log("[LoginForm validate] l.Password:", l.Password)
 	if l.Username == "" {
