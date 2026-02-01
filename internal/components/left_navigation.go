@@ -22,20 +22,17 @@ func NewLeftNavigation() *LeftNavigation {
 func (n *LeftNavigation) OnMount(ctx app.Context) {
 	n.ctx = ctx
 	
-	ctx.ObserveState(state.NavItemsKey).
-		Value(&n.Items).
+	ctx.ObserveState(state.NavItemsKey, &n.Items).
 		OnChange(func() {
 			app.Log("[LeftNavigation] Nav Items changed")
 			n.Refresh(ctx)
 		})
-	ctx.ObserveState(state.ExpandedSectionKey).
-		Value(&n.ExpandedSecID).
+	ctx.ObserveState(state.ExpandedSectionKey, &n.ExpandedSecID).
 		OnChange(func() {
 			app.Log("[LeftNavigation] Expanded Section changed")
 			n.Refresh(ctx)
 		})
-	ctx.ObserveState(state.ActiveItemKey).
-		Value(&n.ActiveItemID).
+	ctx.ObserveState(state.ActiveItemKey, &n.ActiveItemID).
 		OnChange(func() {
 			app.Log("[LeftNavigation] Active Item changed")
 			n.Refresh(ctx)

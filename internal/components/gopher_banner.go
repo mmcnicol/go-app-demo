@@ -21,8 +21,7 @@ func NewGopherBanner() *GopherBanner {
 func (gb *GopherBanner) OnMount(ctx app.Context) {
 	app.Log("[GopherBanner OnMount] Initializing")
 	
-	ctx.ObserveState(state.GopherDemographicsKey).
-		Value(&gb.GopherDemographics).
+	ctx.ObserveState(state.GopherDemographicsKey, &gb.GopherDemographics).
 		OnChange(func() {
 			app.Log("[GopherBanner] Gopher demographics changed")
 			gb.Refresh(ctx)
