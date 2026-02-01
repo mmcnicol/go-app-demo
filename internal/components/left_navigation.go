@@ -74,6 +74,7 @@ func (n *LeftNavigation) Render() app.UI {
 func (n *LeftNavigation) renderItem(item models.NavItem) app.UI {
 
 	hasChildren := len(item.Children) > 0
+	isChild := len(item.Children) == 0
 	
 	/*
 	var expandedSecID string
