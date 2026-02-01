@@ -15,7 +15,7 @@ type BasePage struct {
 	//navItemsGopherContext    []models.NavItem
 	//navItemsNonGopherContext []models.NavItem
 	ActiveID                 string // Still used for content routing
-	//user                     *models.User
+	user                     *models.User
 	//gopherDemographics       *models.GopherDemographics
 	//recentGophers            []models.RecentGopherItem
 	//labResults               []models.LabResultItem
@@ -25,16 +25,16 @@ type BasePage struct {
 	isMounted     bool // Managed internally
 }
 
-func (b *BasePage) Render() app.UI {
-    var content app.UI
-
-	// temp hack
-	user := &models.User{
-		Username: "duser2",
-		Forename: "Demo",
-		Surname:  "User2",
-	}
+// OnMount is called when the component is first loaded
+func (b *BasePage) OnMount(ctx app.Context) {
+	app.Log("[BasePage OnMount] Initializing")
 	
+	user := &models.User{
+		Username: "iamcheating",
+		Forename: "I'm",
+		Surname:  "Cheating",
+	}
+
 	// a hack: should be based of user's roles & permissions
 	userSettings := &models.UserSettings{
 		DefaultNavSectionNonGopherContext: "GopherLists",
@@ -46,8 +46,41 @@ func (b *BasePage) Render() app.UI {
 	ctx.SetState(state.UserObservable, user)
 	ctx.SetState(state.UserSettingsObservable, userSettings)
 
-	// Set the user on BasePage
-	b.user = user
+	//b.user = user
+
+	// Initialize navigation items
+	//b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
+	//b.navItemsGopherContext = b.fetchNavItemsGopherContext()
+	b.activeID = "RecentGophers"
+	// Create gopher navigation instance
+	if b.leftNavigation == nil {
+		app.Log("[BasePage Render] Creating new gopher navigation")
+		b.leftNavigation = components.NewLeftNavigation(b.navItemsNonGopherContext)
+	}
+	app.Log("[BasePage OnMount] leftNavigation initialized")
+	app.Log("[BasePage OnMount] User set:", b.user)
+	
+	b.isMounted = true
+	b.Refresh(ctx)
+}
+
+// Refresh updates the component
+func (b *LeftNavigation) Refresh(ctx app.Context) {
+	ctx.Update()
+}
+
+func (b *BasePage) Render() app.UI {
+	app.Log("[BasePage Render] Called")
+	app.Log("[BasePage Render] Called, isMounted:", b.isMounted)
+	
+	// Don't render anything until mounted
+	if !b.isMounted {
+		app.Log("[BasePage Render] Not mounted yet, returning loading/empty")
+		//return app.Div().Class("nav-sidebar loading")
+		return app.Div()
+	}
+
+    var content app.UI
 	
 	// Check if user is nil (using pointer)
 	if b.user == nil {
@@ -251,51 +284,6 @@ func (b *BasePage) handleLogout(ctx app.Context) {
 	ctx.SetState(state.ActiveItemObservable, nil)
 
 	// Trigger re-render
-	ctx.Update()
-}
-
-
-// OnMount is called when the component is first loaded
-func (b *BasePage) OnMount(ctx app.Context) {
-	app.Log("[BasePage OnMount] Initializing")
-	
-	user := &models.User{
-		Username: "iamcheating",
-		Forename: "I'm",
-		Surname:  "Cheating",
-	}
-
-	// a hack: should be based of user's roles & permissions
-	userSettings := &models.UserSettings{
-		DefaultNavSectionNonGopherContext: "GopherLists",
-		DefaultNavSectionGopherContext: "GopherRecords",
-		DefaultNavItemNonGopherContext:  "RecentGophers",
-		DefaultNavItemGopherContext:  "LabResults",
-	}
-	
-	ctx.SetState(state.UserObservable, user)
-	ctx.SetState(state.UserSettingsObservable, userSettings)
-
-	//b.user = user
-
-	// Initialize navigation items
-	//b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
-	//b.navItemsGopherContext = b.fetchNavItemsGopherContext()
-	b.activeID = "RecentGophers"
-	// Create gopher navigation instance
-	if b.leftNavigation == nil {
-		app.Log("[BasePage Render] Creating new gopher navigation")
-		b.leftNavigation = components.NewLeftNavigation(b.navItemsNonGopherContext)
-	}
-	app.Log("[BasePage OnMount] leftNavigation initialized")
-	app.Log("[BasePage OnMount] User set:", b.user)
-	
-	b.isMounted = true
-	b.Refresh(ctx)
-}
-
-// Refresh updates the component
-func (b *LeftNavigation) Refresh(ctx app.Context) {
 	ctx.Update()
 }
 
