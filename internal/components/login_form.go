@@ -79,13 +79,13 @@ func (l *LoginForm) Render() app.UI {
 func (l *LoginForm) onUsernameChange(ctx app.Context, e app.Event) {
 	l.Username = ctx.JSSrc().Get("value").String()
 	app.Log("[LoginForm onUsernameChange] l.Username:", l.Username)
-	ctx.Update()
+	//ctx.Update()
 }
 
 func (l *LoginForm) onPasswordChange(ctx app.Context, e app.Event) {
 	l.Password = ctx.JSSrc().Get("value").String()
 	app.Log("[LoginForm onPasswordChange] l.Password:", l.Password)
-	ctx.Update()
+	//ctx.Update()
 }
 
 func (l *LoginForm) OnSubmit(ctx app.Context, e app.Event) {
