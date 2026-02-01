@@ -15,7 +15,7 @@ type BasePage struct {
 	//navItemsGopherContext    []models.NavItem
 	//navItemsNonGopherContext []models.NavItem
 	ActiveID                 string // Still used for content routing
-	user                     *models.User
+	User                     *models.User
 	//gopherDemographics       *models.GopherDemographics
 	//recentGophers            []models.RecentGopherItem
 	//labResults               []models.LabResultItem
@@ -29,6 +29,12 @@ type BasePage struct {
 func (b *BasePage) OnMount(ctx app.Context) {
 	app.Log("[BasePage OnMount] Initializing")
 	
+	ctx.ObserveState(state.UserKey, &b.User changed").
+		OnChange(func() {
+			app.Log("[BasePage] User changed")
+			b.Refresh(ctx)
+		})
+
 	user := &models.User{
 		Username: "iamcheating",
 		Forename: "I'm",
