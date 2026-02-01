@@ -258,15 +258,15 @@ func (b *BasePage) handleQuickSearch(ctx app.Context, patientID string) error {
 func (b *BasePage) handleLogout(ctx app.Context) {
 	app.Log("[BasePage] Logging out user")
 	
-	ctx.SetState(state.UserObservable, nil)
-	ctx.SetState(state.UserSettingsObservable, nil)
+	ctx.SetState(state.UserKey, nil)
+	ctx.SetState(state.UserSettingsKey, nil)
 
-	ctx.SetState(state.GopherDemographicsObservable, nil)
+	ctx.SetState(state.GopherDemographicsKey, nil)
 	
-	ctx.SetState(state.NavItemsObservable, nil)
+	ctx.SetState(state.NavItemsKey, nil)
 	
-	ctx.SetState(state.ExpandedSectionObservable, nil)
-	ctx.SetState(state.ActiveItemObservable, nil)
+	ctx.SetState(state.ExpandedSectionKey, nil)
+	ctx.SetState(state.ActiveItemKey, nil)
 
 	// Trigger re-render
 	ctx.Update()
@@ -278,15 +278,15 @@ func (b *BasePage) OnNav(ctx app.Context) {
 	// We could check for existing session/cookie here
 	// For demo purposes, we'll start with no user logged in
 
-	ctx.SetState(state.UserObservable, nil)
-	ctx.SetState(state.UserSettingsObservable, nil)
+	ctx.SetState(state.UserKey, nil)
+	ctx.SetState(state.UserSettingsKey, nil)
 
-	ctx.SetState(state.GopherDemographicsObservable, nil)
+	ctx.SetState(state.GopherDemographicsKey, nil)
 	
-	ctx.SetState(state.NavItemsObservable, nil)
+	ctx.SetState(state.NavItemsKey, nil)
 	
-	ctx.SetState(state.ExpandedSectionObservable, nil)
-	ctx.SetState(state.ActiveItemObservable, nil)
+	ctx.SetState(state.ExpandedSectionKey, nil)
+	ctx.SetState(state.ActiveItemKey, nil)
 
     ctx.Update()
 }
