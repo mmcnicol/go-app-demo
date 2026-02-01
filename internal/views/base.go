@@ -292,6 +292,7 @@ func (b *BasePage) OnNav(ctx app.Context) {
 	// We could check for existing session/cookie here
 	// For demo purposes, we'll start with no user logged in
 
+	/*
 	ctx.SetState(state.UserKey, nil)
 	ctx.SetState(state.UserSettingsKey, nil)
 
@@ -301,7 +302,8 @@ func (b *BasePage) OnNav(ctx app.Context) {
 	
 	ctx.SetState(state.ExpandedSectionKey, nil)
 	ctx.SetState(state.ActiveItemKey, nil)
-
+	*/
+	
     ctx.Update()
 }
 
