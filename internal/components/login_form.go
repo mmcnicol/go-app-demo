@@ -29,6 +29,7 @@ func NewLoginForm(onLogin LoginHandler) *LoginForm {
 }
 
 func (l *LoginForm) Render() app.UI {
+	app.Log("[LoginForm Render] ")
 	return app.Div().Class("login-form").Body(
 		app.H2().Text("Login"),
 		app.If(l.Error != "",
@@ -36,7 +37,7 @@ func (l *LoginForm) Render() app.UI {
 				return app.Div().Class("error-message").Text(l.Error)
 			},
 		),
-		app.Form().OnSubmit(l.onSubmit).Body(
+		app.Form().OnSubmit(l.OnSubmit).Body(
 			app.Div().Class("form-group").Body(
 				app.Label().For("username").Text("Username"),
 				app.Input().
@@ -85,12 +86,14 @@ func (l *LoginForm) onPasswordChange(ctx app.Context, e app.Event) {
 	ctx.Update()
 }
 
-func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
+func (l *LoginForm) OnSubmit(ctx app.Context, e app.Event) {
 	e.PreventDefault()
+	app.Log("[LoginForm OnSubmit] ")
 
 	// Validate inputs
 	err := l.validate()
 	if err != nil {
+		app.Log("[LoginForm OnSubmit] VALIDATE FAILED")
 		l.Error = err.Error()
 		ctx.Update()
 		return
@@ -106,24 +109,33 @@ func (l *LoginForm) onSubmit(ctx app.Context, e app.Event) {
 
 	// If we have a login handler, use it
 	if l.OnLogin != nil {
+		app.Log("[LoginForm OnSubmit] calling performLogin")
 		go l.performLogin(ctx)
 	} else {
 		// Fallback to mock login
+		app.Log("[LoginForm OnSubmit] Fallback to mock login")
 		go l.mockLogin(ctx)
 	}
 }
 
 func (l *LoginForm) performLogin(ctx app.Context) {
+	app.Log("[LoginForm performLogin] ")
 	// Call the provided login handler
 	user, err := l.OnLogin(ctx, l.Username, l.Password)
+	if err != nil {
+		app.Log("[LoginForm performLogin] l.OnLogin returned an error")
+	}
 
 	// Use Async to safely update UI from goroutine
 	ctx.Async(func() {
+		app.Log("[LoginForm performLogin] in async")
 		l.IsLoading = false
 
 		if err != nil {
+			app.Log("[LoginForm performLogin] error")
 			l.Error = err.Error()
 		} else if user != nil {
+			app.Log("[LoginForm performLogin] LOGIN SUCCESSFUL")
 			l.Error = "Login successful! Redirecting..."
 			// Clear form
 			l.Username = ""

@@ -32,13 +32,14 @@ func (f *UserForm) OnInputChange(ctx app.Context, e app.Event) {
 
 func (f *UserForm) OnSubmit(ctx app.Context, e app.Event) {
 	e.PreventDefault() // Stop the browser from reloading the page
-	
+	app.Log("[UserForm OnSubmit] ")	
 	f.isSubmitting = true
 	f.message = "Sending data..."
 	ctx.Update()
 
 	// Logic runs in a background goroutine so the UI doesn't freeze
 	ctx.Async(func() {
+		app.Log("[UserForm OnSubmit] in Async")
 		data := map[string]string{
 			"name":  f.name,
 			"email": f.email,
