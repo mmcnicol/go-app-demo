@@ -14,7 +14,7 @@ type BasePage struct {
 	app.Compo
 	//navItemsGopherContext    []models.NavItem
 	//navItemsNonGopherContext []models.NavItem
-	activeID                 string // Still used for content routing
+	ActiveID                 string // Still used for content routing
 	//user                     *models.User
 	//gopherDemographics       *models.GopherDemographics
 	//recentGophers            []models.RecentGopherItem
@@ -36,10 +36,10 @@ func (b *BasePage) Render() app.UI {
 	
 	// a hack: should be based of user's roles & permissions
 	userSettings := &models.UserSettings{
-		defaultNavSectionNonGopherContext: "GopherLists",
-		defaultNavSectionGopherContext: "GopherRecords",
-		defaultNavItemNonGopherContext:  "RecentGophers",
-		defaultNavItemGopherContext:  "LabResults",
+		DefaultNavSectionNonGopherContext: "GopherLists",
+		DefaultNavSectionGopherContext: "GopherRecords",
+		DefaultNavItemNonGopherContext:  "RecentGophers",
+		DefaultNavItemGopherContext:  "LabResults",
 	}
 	
 	ctx.SetState(state.UserObservable, user)
@@ -162,10 +162,10 @@ func (b *BasePage) handleLogin(ctx app.Context, username string, password string
 		
 		// a hack: should be based of user's roles & permissions
 		userSettings := &models.UserSettings{
-			defaultNavSectionNonGopherContext: "GopherLists",
-			defaultNavSectionGopherContext: "GopherRecords",
-			defaultNavItemNonGopherContext:  "RecentGophers",
-			defaultNavItemGopherContext:  "LabResults",
+			DefaultNavSectionNonGopherContext: "GopherLists",
+			DefaultNavSectionGopherContext: "GopherRecords",
+			DefaultNavItemNonGopherContext:  "RecentGophers",
+			DefaultNavItemGopherContext:  "LabResults",
 		}
 
 		ctx.SetState(state.UserObservable, user)
@@ -266,10 +266,10 @@ func (b *BasePage) OnMount(ctx app.Context) {
 
 	// a hack: should be based of user's roles & permissions
 	userSettings := &models.UserSettings{
-		defaultNavSectionNonGopherContext: "GopherLists",
-		defaultNavSectionGopherContext: "GopherRecords",
-		defaultNavItemNonGopherContext:  "RecentGophers",
-		defaultNavItemGopherContext:  "LabResults",
+		DefaultNavSectionNonGopherContext: "GopherLists",
+		DefaultNavSectionGopherContext: "GopherRecords",
+		DefaultNavItemNonGopherContext:  "RecentGophers",
+		DefaultNavItemGopherContext:  "LabResults",
 	}
 	
 	ctx.SetState(state.UserObservable, user)
