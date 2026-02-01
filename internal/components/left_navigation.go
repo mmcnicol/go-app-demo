@@ -22,22 +22,31 @@ func NewLeftNavigation() *LeftNavigation {
 func (n *LeftNavigation) OnMount(ctx app.Context) {
 	n.ctx = ctx
 	
-	// Subscribe to all relevant state
-	ctx.ObserveState(state.NavItemsKey).Value(&n.Items)
-	ctx.ObserveState(state.ExpandedSectionKey).Value(&n.ExpandedSecID)
-	ctx.ObserveState(state.ActiveItemKey).Value(&n.ActiveItemID)
-
-	// Update component when state changes
-    ctx.ObserveState(state.NavItemsKey).OnChange(ctx.Update)
-	ctx.ObserveState(state.ExpandedSectionKey).OnChange(ctx.Update)
-	ctx.ObserveState(state.ActiveItemKey).OnChange(ctx.Update)
-
-	// Read state
-	ctx.ObserveState(state.NavItemsKey).Value(&n.Items)
-	ctx.ObserveState(state.ExpandedSectionKey).Value(&n.ExpandedSecID)
-	ctx.ObserveState(state.ActiveItemKey).Value(&n.ActiveItemID)
-
+	ctx.ObserveState(state.NavItemsKey).
+		Value(&n.Items).
+		OnChange(func() {
+			app.Log("[LeftNavigation] Nav Items changed")
+			n.Refresh(ctx)
+		})
+	ctx.ObserveState(state.ExpandedSectionKey).
+		Value(&n.ExpandedSecID).
+		OnChange(func() {
+			app.Log("[LeftNavigation] Expanded Section changed")
+			n.Refresh(ctx)
+		})
+	ctx.ObserveState(state.ActiveItemKey).
+		Value(&n.ActiveItemID).
+		OnChange(func() {
+			app.Log("[LeftNavigation] Active Item changed")
+			n.Refresh(ctx)
+		})
 	n.isMounted = true
+	n.Refresh(ctx)
+}
+
+// Refresh updates the component
+func (n *GopherBanner) Refresh(ctx app.Context) {
+	ctx.Update()
 }
 
 func (n *LeftNavigation) Render() app.UI {
