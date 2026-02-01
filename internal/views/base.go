@@ -22,6 +22,7 @@ type BasePage struct {
 	
 	// Store navigation component instance
 	//leftNavigation    *components.LeftNavigation
+	isMounted     bool // Managed internally
 }
 
 func (b *BasePage) Render() app.UI {
@@ -275,11 +276,11 @@ func (b *BasePage) OnMount(ctx app.Context) {
 	ctx.SetState(state.UserObservable, user)
 	ctx.SetState(state.UserSettingsObservable, userSettings)
 
-	b.user = user
+	//b.user = user
 
 	// Initialize navigation items
-	b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
-	b.navItemsGopherContext = b.fetchNavItemsGopherContext()
+	//b.navItemsNonGopherContext = b.fetchNavItemsNonGopherContext()
+	//b.navItemsGopherContext = b.fetchNavItemsGopherContext()
 	b.activeID = "RecentGophers"
 	// Create gopher navigation instance
 	if b.leftNavigation == nil {
@@ -289,6 +290,12 @@ func (b *BasePage) OnMount(ctx app.Context) {
 	app.Log("[BasePage OnMount] leftNavigation initialized")
 	app.Log("[BasePage OnMount] User set:", b.user)
 	
+	b.isMounted = true
+	b.Refresh(ctx)
+}
+
+// Refresh updates the component
+func (b *LeftNavigation) Refresh(ctx app.Context) {
 	ctx.Update()
 }
 
