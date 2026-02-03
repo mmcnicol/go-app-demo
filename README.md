@@ -118,6 +118,36 @@ Because go-app renders standard HTML5, it is 100% compatible with any CSS framew
 * Scoped Styling: go-app doesn't have "CSS-in-JS" built-in, but you can use the .Style() method for dynamic logic.
 * The "Nice" Factor: Since you aren't fighting a framework's default theme, your app looks exactly as good as your CSS skills (or your CSS framework of choice) allow.
 
+An example component using go-app's built-in style system:
+```Go
+type Button struct {
+    app.Compo
+    variant string // "primary", "secondary"
+}
+
+func (b *Button) Render() app.UI {
+    styles := map[string]string{
+        "padding": "12px 24px",
+        "borderRadius": "4px",
+        "fontWeight": "600",
+        "cursor": "pointer",
+    }
+    
+    // Conditional styling
+    if b.variant == "primary" {
+        styles["backgroundColor"] = "#0066CC"
+        styles["color"] = "white"
+    } else {
+        styles["backgroundColor"] = "#F0F0F0"
+        styles["color"] = "#333"
+    }
+    
+    return app.Button().
+        Text("Click Me").
+        Styles(styles)
+}
+```
+
 ## UI Component Library
 
 The Reality: go-app does not come with a built-in library of high-level components (like Material UI or Ant Design).
