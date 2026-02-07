@@ -177,7 +177,7 @@ In short: It's like React's programming model, but using Go's type safety, compi
 
 ## HTML Elements
 
-For every standard browser tag (like <div>, <h1>, <a>, or <input>), go-app provides a corresponding Go function. These functions use method chaining to set attributes, styles, and event handlers.
+For every standard browser tag, go-app provides a corresponding Go function. These functions use method chaining to set attributes, styles, and event handlers.
 
 An example:
 ```Go
